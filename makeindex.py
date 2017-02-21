@@ -18,11 +18,13 @@ template = '''
 <head>
 </head>
 <body>
-<h1>Index of WebGPGPU</h1>
+<h1>Index of %(foldername)s</h1>
 %(content)s
 </body>
 </html>
 '''
+
+foldername = os.path.relpath(".","..")#os.getcwd()
 
 import locale
 from functools import cmp_to_key
