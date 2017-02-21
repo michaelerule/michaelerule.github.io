@@ -43,7 +43,7 @@ for root,dirs,files in os.walk('.'):
         if file[0]=='.': continue
         print(file)
         content+=\
-        '<a href="./%(root)s/%(file)s">%(file)s</a><br/>'%globals()
+        '<a href="%(root)s/%(file)s">%(file)s</a><br/>'%globals()
 
 with open("index.html", "w") as index:
     index.write(template%globals())
