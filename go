@@ -2,5 +2,5 @@
 
 ./makeindex.py
 git add --all
-git commit -m "updated website"
+git commit -m $1
 git push -u origin master
