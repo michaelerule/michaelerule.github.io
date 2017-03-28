@@ -5,7 +5,7 @@
 <script src="../lib/gpurand.js"></script>
 <script src="../lib/complex_macros.js"></script>
 
-<script id="sharp" type="x-shader/x-fragment">
+<script id="sharp" type="gpgpu-shader">
 uniform sampler2D img;
 uniform sampler2D blur;
 void main() {
@@ -36,8 +36,9 @@ function main()
     img  = image_texture(gl,tulip);
     blur1 = GPUGaussianMultiBlur(gl,0.5);
     blur2 = GPUGaussianMultiBlur(gl,1.9);
-    sharp= getRasterProgram(gl,'sharp');
-    show = GPUcopy(gl);
+    sharp = getRasterProgram(gl,'sharp');
+    show  = GPUcopy(gl);
+    show(img);
     // Don't blur left side into right side: clamp textures to edge 
     buf1 = newBasicFramebuffer(gl,{wrap : gl.CLAMP_TO_EDGE});
     buf2 = newBasicFramebuffer(gl,{wrap : gl.CLAMP_TO_EDGE});
