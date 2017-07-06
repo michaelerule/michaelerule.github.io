@@ -1,0 +1,690 @@
+<html>
+<head>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css">
+
+body { 
+    background-color: #333;
+    margin:0 auto;
+    font-family: "Lucida Console", Monaco, monospace;
+    color:black;
+    line-height: 130%; 
+    text-decoration:none; 
+}
+
+.dropshadow {
+    width:827px;
+    margin:0 auto;
+    padding: 0 10 15 10;
+    /*-moz-box-shadow:    0px 0px 14px #000;
+	-webkit-box-shadow: 0px 0px 14px #000;
+	box-shadow:         0px 0px 14px #000;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;*/
+}
+
+.pview {
+    width:512px;
+    height:512px;
+    float: right;
+    position: relative;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: moz-none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.pcontainer {
+    width:825px;
+    height:512px;
+    float: right;
+    margin: 100px auto;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: moz-none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.pcontrols {
+    width:300px;
+    height:512px;
+    float: left;
+    color: #aaa;
+    font-size: 12px;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: moz-none;
+	-ms-user-select: none;
+	user-select: none;
+}
+.ptoggle {
+    width: 11px;
+    height:11px;
+    margin-right: 7px;
+    background-color: #333;
+    border: solid 1px #aaa;
+	position: relative;
+    cursor: pointer !important;
+	line-height: 13px;
+    float: left;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: moz-none;
+	-ms-user-select: none;
+	user-select: none;
+}
+.pcursor {
+    width:  11px;
+    height: 11px;
+    margin: -11 0;
+    background-color: #333;
+    border: solid 1px #666;
+	position: relative;
+    /* rounded corners ( does not work in opera, IE ) */
+    -moz-border-radius:    6px;
+    -webkit-border-radius: 6px;
+    -khtml-border-radius:  6px;
+    border-radius:         6px;
+    cursor: pointer !important;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: moz-none;
+	-ms-user-select: none;
+	user-select: none;
+}
+.pfreecursor {
+    width:  15px;
+    height: 15px;
+    margin: -11 0;
+    background-color: #222;
+    border: solid 2px #aaa;
+	position: relative;
+    /* rounded corners ( does not work in opera, IE ) */
+    -moz-border-radius:    11px;
+    -webkit-border-radius: 11px;
+    -khtml-border-radius:  11px;
+    border-radius:         11px;
+    cursor: pointer !important;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: moz-none;
+	-ms-user-select: none;
+	user-select: none;
+}
+.pslidercontainer {
+    width: 300px;
+    height:13px;
+    padding: 5 0 5 0;
+    float: left;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: moz-none;
+	-ms-user-select: none;
+	user-select: none;
+}
+.pslidername {
+	line-height: 13px;
+    width: 50px;
+    float: left;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: moz-none;
+	-ms-user-select: none;
+	user-select: none;
+}
+.pslider {
+    width: 200px;
+    height:13px;
+    float: right;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: moz-none;
+	-ms-user-select: none;
+	user-select: none;
+}
+.pslider_core {
+    width: 100%;
+    height:1px;
+    margin: 6 0 4 0;
+    background-color: #666;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: moz-none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.optionbutton {
+	width: 22px;
+	height: 22px;
+    background-color: #444;
+    border: solid 1px #888;
+    float: left;
+    cursor: pointer !important;
+    margin: -1px -1px 0px 0px;
+    padding: 1px 1px;
+    text-align: center;
+}
+.optionbutton:hover {
+    background-color: #888 !important;
+    color:            #333 !important;
+}
+.radiobutton {
+	height: 17px;
+    background-color: #444;
+    border: solid 1px #888;
+    float: left;
+    cursor: pointer !important;
+    margin: -1px -1px 0px 0px;
+    padding: 1px 5px;
+    text-align: center;
+}
+.radiobutton:hover {
+    background-color: #888 !important;
+    color:            #333 !important;
+}
+.togglebutton {
+	height: 19px;
+    background-color: #333;
+    border: solid 1px #888;
+    float: left;
+    cursor: pointer !important;
+    margin: -1px -1px 0px 0px;
+    padding: 1px 10px;
+    text-align: center;
+}
+.poptionrcontainer {
+    width: 300px;
+    height:13px;
+    padding: 5 0 5 0;
+    float: left;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: moz-none;
+	-ms-user-select: none;
+	user-select: none;
+}
+.poptionname {
+	height: 19px;
+	line-height: 19px;
+    width: 100px;
+    float: left;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: moz-none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+}
+</style>
+</head>
+<body onload="perceptron()">
+
+<div class="dropshadow">
+<div class="pcontainer">
+
+<div class="pcontrols">
+<div class="pslidercontainer">
+	<div class="ptoggle" id="toggle1"></div>
+	<div class="pslidername">noise</div>
+	<div class="pslider" id="slider1"><div class="pslider_core" id="core1"></div>
+	<div class="pcursor" id="cursor1"></div></div>
+</div>
+<div class="pslidercontainer">
+	<div class="ptoggle" id="toggle2"></div>
+	<div class="pslidername">contrast</div>
+	<div class="pslider" id="slider2"><div class="pslider_core" id="core2"></div>
+	<div class="pcursor" id="cursor2"></div></div>
+</div>
+<div class="pslidercontainer">
+	<div class="ptoggle" id="toggle3"></div>
+	<div class="pslidername">brightness</div>
+	<div class="pslider" id="slider3"><div class="pslider_core" id="core3"></div>
+	<div class="pcursor" id="cursor3"></div></div>
+</div>
+<div class="pslidercontainer">
+	<div class="ptoggle" id="toggle4"></div>
+	<div class="pslidername">hue</div>
+	<div class="pslider" id="slider4"><div class="pslider_core" id="core4"></div>
+	<div class="pcursor" id="cursor4"></div></div>
+</div>
+<div class="pslidercontainer">
+	<div class="ptoggle" id="toggle5"></div>
+	<div class="pslidername">saturation</div>
+	<div class="pslider" id="slider5"><div class="pslider_core" id="core5"></div>
+	<div class="pcursor" id="cursor5"></div></div>
+</div>
+<div class="pslidercontainer">
+	<div class="ptoggle" id="toggle6"></div>
+	<div class="pslidername">blur</div>
+	<div class="pslider" id="slider6"><div class="pslider_core" id="core6"></div>
+	<div class="pcursor" id="cursor6"></div></div>
+</div>
+<div class="pslidercontainer">
+	<div class="ptoggle" id="toggle7"></div>
+	<div class="pslidername">motion blur</div>
+	<div class="pslider" id="slider7"><div class="pslider_core" id="core7"></div>
+	<div class="pcursor" id="cursor7"></div></div>
+</div>
+
+
+
+
+
+</div>
+
+<div class="pview" id="viewport">
+<canvas id="canvas" width="1" height="1"">Sorry, your browser does not support JavaScript canvas, or it is disabled.
+</canvas>
+<div class="pfreecursor" id="cursor8"></div>
+<div class="pfreecursor" id="cursor9"></div>
+<font size='1'>(c) michael rule 2015</font>
+</div>
+
+</div>
+<br clear="all" />
+
+</div>
+
+<script type="application/javascript">
+function print(msg) 
+{
+    setTimeout(function() {
+        throw new Error(msg);
+    }, 0);
+}
+function perceptron(){
+
+	var N  = 512;
+	var N2 = N/2;
+
+	var canvas = document.getElementById('canvas');
+	var viewport = document.getElementById('viewport');
+	canvas.width  = N; 
+	canvas.height = N; 
+	var ctx = canvas.getContext('2d');
+	var imageData = ctx.getImageData(0, 0, N, N);
+
+	// initialize map data
+	var map  = new Int32Array( N*N*2 );
+	for (var y = 0; y < N; ++y) {
+		for (var x = 0; x < N; ++x) {
+			var real   = (x-N2)*4.0/N;
+			var imag   = (y-N2)*4.0/N;
+			var real2  = real;//*real-imag*imag;
+			var imag2  = imag;//*real*2;
+			var x2     = Math.round((real2*N/4+N2)*16);
+			var y2     = Math.round((imag2*N/4+N2)*16);
+			var index  = y*N + x;
+			map[index*2  ] = x2 - N2*16;
+			map[index*2+1] = y2 - N2*16;
+		}
+	}
+	var buff1 = new Uint32Array( N*N + 1);
+	var buff2 = new Uint32Array( N*N + 1);
+
+	offsetx  = 0;
+	offsety  = 0;
+	costheta = 0;
+	sintheta = 0;
+		
+	var maps    = new Array();
+	var presets = new Array();
+	var cursors = new Array();
+	var sliders = new Array();
+	var toggles = new Array();
+	var slcores = new Array();
+	cursor_selected = -1;
+
+	var SLIDERRADIUS = document.getElementById('cursor1').offsetWidth/2;
+	var SLIDERW      = document.getElementById('slider1').offsetWidth;
+
+	// initialize radio buttons
+	// there are five groups that behave like radio buttons
+	// define a thin wrapper class that deals with this?
+	function mutuallyExclusiveHilighting(e) {
+		var sender = e.target? e.target : e.srcElement;
+		var peers = sender.parentNode.getElementsByClassName(sender.className);
+		for (var i=0; peers[i]; i++) {
+			peers[i].style.backgroundColor = "#444";
+			peers[i].style.color           = "#aaa";
+		}
+		sender.style.backgroundColor = "#888";
+		sender.style.color           = "#333";
+	}
+	var buttons = document.getElementsByClassName("radiobutton");
+	for (var i=0; buttons[i]; i++) buttons[i].onclick = mutuallyExclusiveHilighting;
+	var buttons = document.getElementsByClassName("optionbutton");
+	for (var i=0; buttons[i]; i++) buttons[i].onclick = mutuallyExclusiveHilighting;
+
+	function updateCursor(i,x,y) {
+		if (i<=7) {
+			x = x-SLIDERRADIUS-sliders[i].offsetLeft;
+			cursors[i].style.left   = x<0?0:x>SLIDERW-2*SLIDERRADIUS?SLIDERW-2*SLIDERRADIUS:x;
+			cursors[i].style.cursor = 'pointer';
+		} else {
+			y = y-viewport.offsetTop-5;
+			x = x-viewport.offsetLeft-5;
+			//cursors[i].style.top    = canvas.offsetTop -N2 + (y<SLIDERRADIUS?SLIDERRADIUS:y>=N-SLIDERRADIUS*2-1?N-2-SLIDERRADIUS*2:y)+SLIDERRADIUS-2;
+			//cursors[i].style.left   = canvas.offsetLeft-N2 + (x<SLIDERRADIUS?SLIDERRADIUS:x>=N-SLIDERRADIUS*2-1?N-2-SLIDERRADIUS*2:x)-SLIDERRADIUS;
+			cursors[i].style.top    = (y<SLIDERRADIUS?SLIDERRADIUS:y>=N-SLIDERRADIUS*2-1?N-2-SLIDERRADIUS*2:y)+SLIDERRADIUS-2;
+			cursors[i].style.left   = (x<SLIDERRADIUS?SLIDERRADIUS:x>=N-SLIDERRADIUS*2-1?N-2-SLIDERRADIUS*2:x)-SLIDERRADIUS;
+			cursors[i].style.cursor = 'pointer';
+		}
+	}
+	
+	function toggleSlider(i) {
+		if (toggles[i].on) {
+			toggles[i].style.backgroundColor = "#333"
+			cursors[i].style.borderColor     = "#666"
+			slcores[i].style.backgroundColor = "#666"
+		}
+		else {
+			toggles[i].style.backgroundColor = "#aaa"
+			cursors[i].style.borderColor     = "#aaa"
+			slcores[i].style.backgroundColor = "#aaa"
+		}
+		toggles[i].on = !toggles[i].on;
+	}
+	
+	// initialize all the sliders
+	for (var i=1; i<=7; i++) {
+		cursors[i] = document.getElementById('cursor'+i);
+		sliders[i] = document.getElementById('slider'+i);
+		toggles[i] = document.getElementById('toggle'+i);
+		slcores[i] = document.getElementById('core'+i);
+		toggles[i].on = false;
+		toggles[i].onselectstart = function(){ return false; }
+		cursors[i].onselectstart = function(){ return false; }
+		sliders[i].onselectstart = function(){ return false; }
+		slcores[i].onselectstart = function(){ return false; }
+		cursors[i].onmousedown = (function(i) { 
+			return function(e) {
+				if (toggles[i].on) updateCursor(cursor_selected = i,e.clientX);
+			};
+		})(i);
+		toggles[i].onclick = (function(i) { 
+			return function(e) {
+				toggleSlider(i);
+			};
+		})(i);
+	}
+	
+	// initialize the floating cursors
+	for (var i=8; i<=9; i++) {
+		cursors[i] = document.getElementById('cursor'+i);
+		cursors[i].onselectstart = function(){ return false; }
+		cursors[i].style.position = 'absolute'
+		cursors[i].onmousedown = (function(i) { 
+			return function(e) {
+				cursor_selected = i;
+				updateCursor(i,e.clientX,e.clientY);
+			};
+		})(i);
+		cursors[i].style.top  = N2;
+		cursors[i].style.left = N2-SLIDERRADIUS;
+	}
+	document.onmouseup   = function(e) {cursor_selected = -1;}
+	document.onmousemove = function(e) {if (cursor_selected>0) updateCursor(cursor_selected,e.clientX,e.clientY);}
+	
+	var buf  = new ArrayBuffer(imageData.data.length);
+	var buf8 = new Uint8ClampedArray(buf);
+	var data = new Uint32Array(buf);
+
+	for (var i=1; i<=7; i++) toggleSlider(i);
+	cursor1.offsetLeft = 0;
+	cursor2.style.left = slider2.offsetWidth/2;
+	cursor3.style.left = slider3.offsetWidth/2;
+	cursor4.style.left = slider4.offsetWidth/20;
+	cursor5.style.left = slider5.offsetWidth*2/3;
+	cursor6.style.left = slider6.offsetWidth/2;
+	cursor7.style.left = slider7.offsetWidth/2;
+	
+	function render() {
+		var rand = Math.floor(Math.random()*0x1000000);
+
+		var noiseOn      = toggles[1].on;
+		var contrastOn   = toggles[2].on;
+		var brightnessOn = toggles[3].on;
+		var hueOn        = toggles[4].on;
+		var saturationOn = toggles[5].on;
+		var blurOn       = toggles[6].on;
+		var motionOn     = toggles[7].on;
+
+		var noise_level  = Math.floor((cursor1.offsetLeft-slider1.offsetLeft)*15/slider1.offsetWidth)+1;
+		var CONTRAST     = Math.floor((cursor2.offsetLeft-slider2.offsetLeft)*256/slider2.offsetWidth);
+		var BRIGHTNESS   = Math.floor((cursor3.offsetLeft-slider3.offsetLeft)*256/slider3.offsetWidth);
+		var HUEROTATE    = Math.floor((cursor4.offsetLeft-slider4.offsetLeft)*6.28318530718/slider4.offsetWidth);
+		var SATURATION   = Math.floor((cursor5.offsetLeft-slider5.offsetLeft)*2*256/slider5.offsetWidth);
+		var blur_amount  = 16-Math.floor((cursor6.offsetLeft-slider6.offsetLeft)*16/slider6.offsetWidth);
+		var motion_blur  = Math.floor((cursor7.offsetLeft-slider7.offsetLeft)*16/slider7.offsetWidth);
+
+		var rsc2 = (256-SATURATION);
+		var Q1 = -256*Math.sin(HUEROTATE)/Math.sqrt(3);
+		var Q2 =  256*(1-Math.cos(HUEROTATE))/3;
+		
+    	var mouseX = cursor8.offsetLeft-canvas.offsetLeft-N2;
+	    var mouseY = cursor8.offsetTop-canvas.offsetTop-N2;
+		var offsetx = mouseX*16 + N2*16;
+		var offsety = mouseY*16 + N2*16;
+		
+    	var mouseX = cursor9.offsetLeft-canvas.offsetLeft-N2;
+	    var mouseY = cursor9.offsetTop-canvas.offsetTop-N2;
+		var mouseTheta  = Math.atan2(mouseX,mouseY);
+		var mouseRadius = 128*128./Math.sqrt(mouseX*mouseX+mouseY*mouseY);
+		var costheta    = Math.cos(mouseTheta)*mouseRadius;
+		var sintheta    = Math.sin(mouseTheta)*mouseRadius;
+		
+		var prev = 0;
+		var next = 0;
+		var curr = 0;
+		var pair = 0;
+		var averageR = 0;
+		var averageG = 0;
+		var averageB = 0;
+		
+		
+		/* first convolution step, also statistics */
+		if (blurOn) {
+			for (var c=0; c<N; c++) {
+				next = buff1[c+N];                                
+				curr = buff1[c]  ;                                
+				pair = prev = next + curr;
+				buff2[c] = pair<<1;                               
+				for (var r=1; r<N-1; r++) {
+					averageR += next>>16&0xff;
+					averageG += next>>8 &0xff;
+					averageB += next    &0xff;
+					curr = next;               
+					next = buff1[c+(r+1)*N];           
+					prev = pair;               
+					pair = next + curr;
+					buff2[c+r*N] = prev + pair;
+				}
+				buff2[c+r*N] = pair<<1;
+			}
+			averageR = Math.floor(averageR/(N*(N-2)));
+			averageG = Math.floor(averageG/(N*(N-2)));
+			averageB = Math.floor(averageB/(N*(N-2)));
+			averageColor  = (averageR<<16|averageG<<8|averageB) & 0xf0f0f0;
+			averageColor |= 0xff000000;
+			var varianceR = 0;
+			var varianceG = 0;
+			var varianceB = 0;
+			/* second convolution step, also statistics */
+			for (var r=0; r<N; r++) {
+				next = buff2[r*N+1];                            
+				curr = buff2[r*N  ];                            
+				pair = prev = next+curr;
+				color = pair<<1;                                
+				color = color>>4&0xf0f0f0;
+				buff1[r*N] = (color<<4)+(buff1[r*N]-color)*blur_amount >> 4 & 0xf0f0f0;
+				for (var c=1; c<N-1; c++) {
+					curr = next;             
+					next = buff2[r*N+c+1];           
+					prev = pair;             
+					pair = next+curr;
+					color        = prev+pair;
+					color        = color>>4 & 0xf0f0f0;
+					buff1[c+r*N] = (color<<4)+(buff1[c+r*N]-color)*blur_amount >> 4 & 0xf0f0f0;
+					var R = (next >> 16 & 0xff) - averageR;
+					var G = (next >>  8 & 0xff) - averageG;
+					var B = (next       & 0xff) - averageB;
+					varianceR += R*R;
+					varianceG += G*G;
+					varianceB += B*B;
+				}
+				color = pair<<1;
+				color = color>>4 & 0xf0f0f0;
+				buff1[x+r*N] = (color<<4)+(buff1[c+r*N]-color)*blur_amount >> 4 & 0xf0f0f0;
+			}
+		} else if (contrastOn || brightnessOn) {
+			for (var c=0; c<N; c++) for (var r=0; r<N; r++) {
+				averageR += next>>16&0xff;
+				averageG += next>>8 &0xff;
+				averageB += next    &0xff;
+			}
+			averageR = Math.floor(averageR/(N*N));
+			averageG = Math.floor(averageG/(N*N));
+			averageB = Math.floor(averageB/(N*N));
+			averageColor  = (averageR<<16|averageG<<8|averageB) & 0xf0f0f0;
+			averageColor |= 0xff000000;
+			var varianceR = 0;
+			var varianceG = 0;
+			var varianceB = 0;
+			for (var r=0; r<N; r++) for (var c=1; c<N-1; c++) {
+				next = buff1[c+r*N];
+				var R = (next >> 16 & 0xff) - averageR;
+				var G = (next >>  8 & 0xff) - averageG;
+				var B = (next       & 0xff) - averageB;
+				varianceR += R*R;
+				varianceG += G*G;
+				varianceB += B*B;
+			}
+		}
+		
+		if (contrastOn||brightnessOn) {
+			varianceR = Math.sqrt(varianceR/(N*(N-2)));
+			varianceG = Math.sqrt(varianceG/(N*(N-2)));
+			varianceB = Math.sqrt(varianceB/(N*(N-2)));
+			var gainR = Math.floor(SATURATION*(CONTRAST*256/(8+varianceR))>>8);
+			var gainG = Math.floor(SATURATION*(CONTRAST*256/(8+varianceG))>>8);
+			var gainB = Math.floor(SATURATION*(CONTRAST*256/(8+varianceB))>>8);
+			var biasR = Math.floor(SATURATION*(BRIGHTNESS*256-256*averageR*CONTRAST/(8+varianceR))>>8);
+			var biasG = Math.floor(SATURATION*(BRIGHTNESS*256-256*averageG*CONTRAST/(8+varianceG))>>8);
+			var biasB = Math.floor(SATURATION*(BRIGHTNESS*256-256*averageB*CONTRAST/(8+varianceB))>>8);
+		} else {
+			var gainR = 256;
+			var gainG = 256;
+			var gainB = 256;
+			var biasR = 0;
+			var biasG = 0;
+			var biasB = 0;
+		}
+		
+		var writeindex = 0;
+		for (var y = 0; y < N; ++y)
+		for (var x = 0; x < N; ++x) {
+			var index  = y*N + x;
+			var x2 = map[index*2  ];
+			var y2 = map[index*2+1];
+			var x3 = (costheta * x2 + sintheta * y2 >> 8) + offsetx;
+			var y3 = (costheta * y2 - sintheta * x2 >> 8) + offsety;
+			var xi = x3>>4;
+			var yi = y3>>4;
+			var xf = x3 & 0xf;
+			var yf = y3 & 0xf;
+			var index = xi+yi*N;
+			var colorA = buff1[index    &0x3ffff];
+			var colorB = buff1[index  +1&0x3ffff];
+			var colorC = buff1[index+N  &0x3ffff];
+			var colorD = buff1[index+N+1&0x3ffff];
+			var colorE = (colorA<<4)+(colorB-colorA)*xf >> 4 & 0xf0f0f0;
+			var colorF = (colorC<<4)+(colorD-colorC)*xf >> 4 & 0xf0f0f0;
+			var color  = (colorE<<4)+(colorF-colorE)*yf >> 4 ;
+			
+			var R = (color >> 16 & 0xf0)*gainR+biasR >>8;
+			var G = (color >> 8  & 0xf0)*gainG+biasG >>8;
+			var B = (color       & 0xf0)*gainB+biasB >>8;
+			
+			if (saturationOn) {
+				var mx = (R>B?G>R?G:R:G>B?G:B)*rsc2;
+				var R = R*gainR+biasR+mx >>8;
+				var G = G*gainG+biasG+mx >>8;
+				var B = B*gainB+biasB+mx >>8;
+			} else {
+				var R = R*gainR+biasR>>8;
+				var G = G*gainG+biasG>>8;
+				var B = B*gainB+biasB>>8;
+			}
+			
+			if (hueOn) {
+				var rb = R-B;
+				var gr = G-R;
+				var bg = B-G;
+				var r1 = (Q2*(gr-rb)-Q1*bg>>8)+R;
+				var Z  = (Q2*(bg-rb)+Q1*gr>>8);
+				G += Z + (R-r1);
+				B -= Z;
+				R = r1;
+			}
+
+			R = R<0?0:R>255?255:R;
+			G = G<0?0:G>255?255:G;
+			B = B<0?0:B>255?255:B;
+			color = R<<16|G<<8|B;
+			color = color&0xf0f0f0;
+
+			if (motionOn)
+				color = (color<<4)+((data[writeindex]&0xf0f0f0)-color)*motion_blur >> 4 & 0xf0f0f0;
+			
+			if (noiseOn) {
+				rand ^= rand>>2^rand<<1;
+				color = (color<<4)+((rand&0xf0f0f0)-color)*noise_level >> 4 & 0xf0f0f0;
+			}
+			
+			data[writeindex]  = 0xff000000 | color;
+			buff2[writeindex] = color;
+			writeindex ++;
+		}
+		
+		imageData.data.set(buf8);
+		ctx.putImageData(imageData, 0, 0);
+		
+		var temp = buff2;
+		buff2 = buff1;
+		buff1 = temp;
+		
+		setTimeout(render, 20);
+	}
+	
+	render();
+}
+
+</script>
+</body>
+</html>
+
+
+
+
+    

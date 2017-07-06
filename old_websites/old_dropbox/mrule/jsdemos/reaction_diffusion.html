@@ -1,0 +1,344 @@
+<html>
+<head>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css">
+body { 
+    background-color: #333;
+    margin:0 auto;
+    font-family: "Lucida Console", Monaco, monospace;
+    color:black;
+    line-height: 130%; 
+    text-decoration:none; 
+}
+.dropshadow {
+    width:500px;
+    margin:0 auto;
+    padding: 0 10 15 10;
+    -moz-box-shadow:    0px 0px 14px #000;
+	-webkit-box-shadow: 0px 0px 14px #000;
+	box-shadow:         0px 0px 14px #000;
+}
+.pview {
+    width:256px;
+    height:256px;
+    float: right;
+}
+.pcontainer {
+    width:500px;
+    float: right;
+    margin: 100px auto;
+}
+.pcursor {
+    width: 11px;
+    height:11px;
+    margin: -11 0;
+    background-color: #333;
+    border: solid 1px #aaa;
+	position: relative;
+    /* rounded corners ( does not work in opera, IE ) */
+    -moz-border-radius:    6px;
+    -webkit-border-radius: 6px;
+    -khtml-border-radius:  6px;
+    border-radius:         6px;
+}
+.ptextcontainer {
+    width: 230px;
+    height: 13px;
+    padding: 5 0 5 0;
+    float: left;
+    line-height: 13px;
+}
+.ptextname {
+	line-height: 13px;
+    width: 100px;
+    color: #888;
+    font-size: 12px;
+    float: right;
+    margin: 5 0 0 0;
+    /* stop hilighting this text ( does not work )*/-webkit-touch-callout: none;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: moz-none;
+	-ms-user-select: none;
+	user-select: none;
+}
+.canvas {
+    float: left;
+}
+</style>
+</head>
+<body onload="demo()">
+
+<div class="dropshadow">
+<div class="pcontainer">
+
+<div class="pview">
+<canvas id="canvas" width="1" height="1">Sorry, your browser does not support JavaScript canvas, or it is disabled.</canvas>
+</div>
+
+<div class="ptextcontainer">
+	<div class="ptextname">dt</div>
+	<input type='number' step='0.1' value='1.0' min='0' name='text1' id="text1">
+</div>
+<div class="ptextcontainer">
+	<div class="ptextname">E field</div>
+	<input type='number' step='0.1' value='0' name='text2' id="text2">
+</div>
+<div class="ptextcontainer">
+	<div class="ptextname">I field</div>
+	<input type='number' step='0.1' value='0' name='text3' id="text3">
+</div>
+<div class="ptextcontainer">
+	<div class="ptextname">Sigma E</div>
+	<input type='number' step='0.1' value='1' name='text4' id="text4">
+</div>
+<div class="ptextcontainer">
+	<div class="ptextname">Sigma I</div>
+	<input type='number' step='0.1' value='2' name='text5' id="text5">
+</div>
+<div class="ptextcontainer">
+	<div class="ptextname">Weight E-E</div>
+	<input type='number' step='0.1' value='7.1' name='text6' id="text6">
+</div>
+<div class="ptextcontainer">
+	<div class="ptextname">Weight E-I</div>
+	<input type='number' step='0.1' value='2' name='text7' id="text7">
+</div>
+<div class="ptextcontainer">
+	<div class="ptextname">Weight I-E</div>
+	<input type='number' step='0.1' value='6' name='text8' id="text8">
+</div>
+<div class="ptextcontainer">
+	<div class="ptextname">Weight I-I</div>
+	<input type='number' step='0.1' value='1' name='text9' id="text9">
+</div>
+<div class="ptextcontainer">
+	<div class="ptextname">Noise</div>
+	<input type='number' step='0.1' value='2' name='text10' id="text10">
+</div>
+<div class="ptextcontainer">
+	<div class="ptextname">Tau I / Tau E</div>
+	<input type='number' step='0.1' value='1' name='text11' id="text11">
+</div>
+</div>
+<br clear="all" />
+</div>
+
+<script type="application/javascript">
+
+function demo() {
+	/* bumbps: dt= 1 fe= 0 fi= 0 se= 1.1 si= 2.6 ee= 9.7 ei= 2.7 ie= 10.4 ii= 3.1 nn= 1.9 ti= 0 et= 0 */
+
+	var N  = 256;
+	var N2 = N/2;
+
+	var canvas = document.getElementById('canvas');
+	canvas.width  = N; 
+	canvas.height = N; 
+	var ctx = canvas.getContext('2d');
+	var imageData = ctx.getImageData(0, 0, N, N);
+
+	var textfields = new Array();
+	for (var i=1; i<=11; i++)
+		textfields[i] = document.getElementById('text'+i);
+	
+	var buffI  = new Float32Array(N2*N2+1);
+	var buffI1 = new Float32Array(N2*N2+1);
+	var buffI2 = new Float32Array(N2*N2+1);
+	var buffE  = new Float32Array(N2*N2+1);
+	var buffE1 = new Float32Array(N2*N2+1);
+	var buffE2 = new Float32Array(N2*N2+1);
+	
+	var buf   = new ArrayBuffer(imageData.data.length);
+	var buf8  = new Uint8ClampedArray(buf);
+	var data  = new Uint32Array(buf);
+
+	var s_e = 1.0;
+	var s_i = 2.0;
+
+	/* initialize E kernel */
+	var k_e_n = 2*3*Math.ceil(s_e)+1;
+	var k_e = new Array(k_e_n);
+	var k_e_int = new Uint8ClampedArray(k_e_n);
+	var k_e_o = Math.floor(k_e_n/2.0);
+	var sum = 0;
+	for (var i=0; i<k_e_n; i++) {
+		var x = i-k_e_o;
+		var y = Math.exp(-(x*x/(s_e*s_e)));
+		k_e[i] = y;
+		sum += y;
+	}
+	for (var i=0; i<k_e_n; i++) k_e[i]/=sum;
+	
+	/* initialize I kernel */
+	var k_i_n = 2*3*Math.ceil(s_i)+1;
+	var k_i = new Array(k_i_n);
+	var k_i_int = new Uint8ClampedArray(k_i_n);
+	var k_i_o = Math.floor(k_i_n/2.0);
+	var sum = 0;
+	for (var i=0; i<k_i_n; i++) {
+		var x = i-k_i_o;
+		var y = Math.exp(-(x*x/(s_i*s_i)));
+		k_i[i] = y;
+		sum += y;
+	}
+	for (var i=0; i<k_i_n; i++) k_i[i]/=sum;
+	
+
+	var running = 1;
+
+	var iteration = 0;
+
+	function render() {
+		//console.log(iteration);
+		//iteration += 1; 
+	
+		var rand = Math.floor(Math.random()*0x1000000);
+
+		var dt  = 1*textfields[1].value;
+		var fe  = 1*textfields[2].value;
+		var fi  = 1*textfields[3].value;
+		var se  = 1*textfields[4].value;
+		var si  = 1*textfields[5].value;
+		var wee = 1*textfields[6].value;
+		var wei = 1*textfields[7].value;
+		var wie = 1*textfields[8].value;
+		var wii = 1*textfields[9].value;
+		var nn  = 1*textfields[10].value;
+		var ti  = 1*textfields[11].value;
+		var et  = 1-dt;
+		var dti = ti*dt;
+		var eti = 1-dti;
+
+
+		/*TODO make these fix the text field */
+		if (dt<0.1) dt=0.1;
+		if (se<0.1) se=0.1;
+		if (si<0.1) si=0.1;
+
+		if (se != s_e) 
+		{
+			console.log('updating excitatory kernel');
+			s_e = se;
+			/* reinitialize E kernel */
+			k_e_n = 2*3*Math.ceil(s_e)+1;
+			k_e = new Array(k_e_n);
+			k_e_int = new Uint8ClampedArray(k_e_n);
+			k_e_o = Math.floor(k_e_n/2.0);
+			sum = 0;
+			for (var i=0; i<k_e_n; i++) {
+				var x = i-k_e_o;
+				var y = Math.exp(-(x*x/(s_e*s_e)));
+				k_e[i] = y;
+				sum += y;
+			}
+			for (var i=0; i<k_e_n; i++) k_e[i]/=sum;
+		}
+		
+		if (si != s_i) 
+		{
+			console.log('updating inhibitory kernel');
+			s_i = si;
+			/* reinitialize I kernel */
+			k_i_n = 2*3*Math.ceil(s_i)+1;
+			k_i = new Array(k_i_n);
+			k_i_int = new Uint8ClampedArray(k_i_n);
+			k_i_o = Math.floor(k_i_n/2.0);
+			sum = 0;
+			for (var i=0; i<k_i_n; i++) {
+				var x = i-k_i_o;
+				var y = Math.exp(-(x*x/(s_i*s_i)));
+				k_i[i] = y;
+				sum += y;
+			}
+			for (var i=0; i<k_i_n; i++) k_i[i]/=sum;
+		}
+
+		/* we need to do a two-step separable convolution */
+		for (var pass=0; pass<2; pass++) {
+			for (var y=0; y<N2; ++y)
+			for (var x=0; x<N2; ++x) {
+				var index = x+N2*y;
+				var indexout = x*N2+y;
+				var accumulator = 0.0;
+				for (var i=0; i<k_e_n; i++)
+					accumulator += buffE1[index+i-k_e_o & 16383]*k_e[i]; 
+				buffE2[indexout] = accumulator;
+				var accumulator = 0.0;
+				for (var i=0; i<k_i_n; i++)
+					accumulator += buffI1[index+i-k_i_o & 16383]*k_i[i];
+				buffI2[indexout] = accumulator;
+			}
+			var tI = buffI2;
+			buffI2 = buffI1;
+			buffI1 = tI;
+			var tE = buffE2;
+			buffE2 = buffE1;
+			buffE1 = tE;
+		}
+
+		function f(x) { return 1/(1+Math.exp(-x)); };
+		
+		var writeindex = 0;
+		var mapindex   = 0;
+		
+		console.log('dt=',dt,'fe=',fe,'fi=',fi,'se=',se,'si=',si,'ee=',wee,'ei=',wei,'ie=',wie,'ii=',wii,'nn=',nn,'ti=',ti,'et=',et);
+
+		for (var y=0; y<N2; ++y)
+		for (var x=0; x<N2; ++x) {
+			var index = x+N2*y;
+			E  = buffE[index];
+			I  = buffI[index];
+			CE = buffE1[index];
+			CI = buffI1[index];
+			noise = ((rand^=rand>>2^rand<<1)&0xff)*0.00392156862745098-0.5;
+			NE = E*et + dt*f(wee*CE-wie*CI+fe+nn*noise);
+			NI = I*eti + dti*f(wei*CE-wii*CI+fi);
+			R = Math.round(NE*255);
+			G = Math.round(NI*255);
+			if (R<0)   R = 0;
+			if (R>255) R = 255;
+			if (G<0)   G = 0;
+			if (G>255) G = 255;
+			var color    = 0xff000000|(R)|(G<<16);
+			//data[x+y*N]  = color;
+			
+			data[2*x+2*y*N]     = color;
+			data[2*x+2*y*N+1]   = color;
+			data[2*x+2*y*N+N]   = color;
+			data[2*x+2*y*N+1+N] = color;
+			
+			buffE[index] = buffE2[index]=NE;
+			buffI[index] = buffI2[index]=NI;
+			index ++;	
+		}
+		
+		imageData.data.set(buf8);
+		ctx.putImageData(imageData, 0, 0);
+		
+		var tI = buffI2;
+		buffI2 = buffI1;
+		buffI1 = tI;
+		
+		var tE = buffE2;
+		buffE2 = buffE1;
+		buffE1 = tE;
+		
+		if (running) setTimeout(render, 0);
+		//else setTimeout(sleeper,0.1);
+	}
+
+	canvas.onmousedown = function(e) {
+		running = 1-running;
+		if (running) render();
+	};
+	
+	render();
+}
+
+</script>
+</body>
+</html>
+
+

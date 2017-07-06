@@ -1,0 +1,265 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<script src="math.js" type="text/javascript"></script>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css">
+.item { 
+    -moz-user-select: -moz-none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+}
+div {
+    width: 100%; 
+    height: 100%;
+    padding: 0;
+    margin:0;
+    position: absolute; 
+    top: 0; 
+    right: 0; 
+    bottom: 0; 
+    left: 0;
+} 
+* { margin:0; padding:0; }
+</style>
+
+</head>
+<body>
+<canvas id="canvas" width="578" height="400"></canvas>
+<canvas id="hist" width="512" height="512"></canvas>
+<script>
+/** As far a I can tell this is how you do println in Javascript? */
+function print(msg){setTimeout(function(){throw new Error(msg);},0);}
+
+function drawImage(imageObj) {
+    /* prepare image canvas */
+    var canvas = document.getElementById('canvas');
+    canvas.width = imageObj.width;
+    canvas.height = imageObj.height;
+    var ccxt = canvas.getContext('2d');
+    ccxt.drawImage(imageObj, 0, 0);
+    var imageData = ccxt.getImageData(0, 0, imageObj.width, imageObj.height);
+    var buff32    = new Uint32Array(imageData.data.buffer);
+    var buff8     = imageData.data;
+    
+    /* prepare histogram canvas */
+    var hist = document.getElementById('hist');
+    var hcxt = hist.getContext('2d');
+    var hid  = hcxt.getImageData(0,0,512,512);
+    var hbuf = new ArrayBuffer(hid.data.length);
+    var hb8  = new Uint8ClampedArray(hbuf);
+    var hdat = new Uint32Array(hbuf);
+    
+    /* measure covariance matrix in alphabeta space
+       this discards luminance, preserves something like
+       saturation and hue. 
+       
+       def online_variance(data):
+            n = 0
+            mean = 0
+            M2 = 0
+            for x in data:
+                n = n + 1
+                delta = x - mean
+                mean = mean + delta/n
+                M2 = M2 + delta*(x - mean)
+            if (n < 2):
+                return 0
+            variance = M2/(n - 1)
+            return variance
+        
+        We need five numbers to summarize this distribution 
+        alpha mean
+        alpha variance
+        beta mean
+        beta variance
+        alpha-beta covariance
+    */
+    
+    var alpha_mean = 0.0;
+    var beta_mean  = 0.0;
+    var alpha_var  = 0.0;
+    var beta_var   = 0.0;
+    var covariance = 0.0;
+    
+    print('image length='+imageData.data.length);
+    print('int32 length='+buff32.length);
+    print('int8  length='+buff8.length);
+    
+    for(var i=0; i<buff32.length; i++) {
+        //^=0xffffff;
+        var c = buff32[i]&0xffffff;
+        var k = i<<2;
+        var r = buff8[k];
+        var g = buff8[k+1];
+        var b = buff8[k+2];
+        var alpha = r-((g+b)>>1);
+        var beta  = 56756*(g-b)>>16;
+        
+        // fuck with luminance
+        /*
+        var luminance = 200*256;
+        var newb = (luminance-77*alpha-beta*218)>>8;
+        var newr = newb+alpha+(beta*37837>>16);
+        var newg = newb+(beta*75674>>16);
+        buff8[k]   = newr;
+        buff8[k+1] = newg;
+        buff8[k+2] = newb;
+        */
+        
+        // compute statistics
+        alpha -= alpha_mean;
+        beta  -= beta_mean;
+        alpha_mean += alpha/(i+1);
+        beta_mean  += beta /(i+1);
+        alpha_var  += alpha*alpha;
+        beta_var   += beta *beta ;
+        covariance += alpha*beta ;
+    }
+    
+    alpha_var  /= (i-1.0);
+    beta_var   /= (i-1.0);
+    covariance /= (i-1.0);
+    print('alpha_mean='+alpha_mean);
+    print('alpha_var='+alpha_var);
+    print('beta_mean='+beta_mean);
+    print('beta_var='+beta_var);
+    print('covariance='+covariance);
+    
+    /* We want something like a whitening transform, but we don't 
+    want to end up rotating the basis -- that would cause a huue rotation
+    We'll need to invert the RGB -> ABL transformation
+    So solve this system for R G B
+    
+    luminance = 77*r+151*g+28*b;
+    alpha     = r-(g+b)/2;
+    beta      = s*(g-b);
+
+    2*alpha    = 2*r-g-b
+    beta/s     = g-b
+    
+    g = b + beta/s
+
+    2*alpha    = 2*r-b-(b + beta/s)
+    2*alpha    = 2r-2b-beta/s
+    alpha      = r-b-beta/2s
+    
+    r = b + alpha+beta/2s
+    
+    luminance = 77*(b + alpha+beta/2s)+151*(b + beta/s)+28*b
+    luminance = 77*b+77*alpha+77*beta/2s+151*b+151*beta/s+28*b
+    luminance = 77*alpha+77*beta/2s+151*beta/s + 77*b+28*b+151*b
+    luminance = 77*alpha+beta*(77/2+151)/s + (77+28+151)*b
+    luminance = 77*alpha+beta*(77/2+151)/s + 256*b
+    256*b = luminance - 77*alpha - beta*(77/2+151)/s
+    
+    b = (luminance - 77*alpha - beta*(77/2+151)/s) / 256
+    b = (luminance-77*newalpha-newbeta*218)+127>>8;
+
+    s = 0.8660254037844386
+    
+    It is probably faster to use floating point. Screw that, using 
+    ints anyway.
+    
+    b = (luminance-77*newalpha-newbeta*218)+127>>8;
+    r = b+alpha+(beta*37837>>16);
+    g = b + (beta*75674>>16);
+    */
+    
+    /* 
+    We actually need the square root of the inverse convariance matrix
+    Set up the covariance matrix inverse as 
+    [[ A B ]
+     [ c D ]]
+    Then apply sqrt formula
+    */
+    var det = 1.0/(alpha_var*beta_var-covariance*covariance);
+    var A = beta_var*det;
+    var B = -covariance*det;
+    var C = B;
+    var D = alpha_var*det;
+    var ss = Math.sqrt(det);
+    var tu = A+D;
+    var st = Math.sqrt(tu+2*ss);
+    var sn = 256*64/st;
+    var sa = (A+ss)*sn;
+    var sb = B*sn;
+    var sc = C*sn;
+    var sd = (D+ss)*sn;
+
+    sa = Math.round(sa);
+    sb = Math.round(sb);
+    sc = Math.round(sc);
+    print('ss='+ss);
+    print('sa='+sa);
+    print('sb='+sb);
+    print('sc='+sc);
+    alpha_mean = Math.round(alpha_mean);
+    beta_mean  = Math.round(beta_mean);
+    
+    var scaleto = 50;
+    var alpha_scale = Math.round(256*scaleto/Math.sqrt(alpha_var));
+    var beta_scale  = Math.round(256*scaleto/Math.sqrt(beta_var));
+    
+    print('alpha std='+Math.sqrt(alpha_var));
+    print('beta  std='+Math.sqrt(beta_var)); 
+    print('alpha scale='+(scaleto/Math.sqrt(alpha_var)))
+    print('beta  scale='+(scaleto/Math.sqrt(beta_var)))
+    
+    for(var i=0; i<buff32.length; i++) {
+        var c = buff32[i]&0xffffff;
+        var k = i<<2;
+        var r = buff8[k];
+        var g = buff8[k+1];
+        var b = buff8[k+2];
+        var luminance = 77*r+151*g+28*b;
+        var alpha     = r-((g+b)>>1);
+        var beta      = 56756*(g-b)>>16;
+        alpha -= alpha_mean;
+        beta  -= beta_mean;
+        var newalpha = sa*alpha + sb*beta + 127 >> 8;
+        var newbeta  = sc*alpha + sd*beta + 127 >> 8;
+        var newb = (luminance-77*newalpha-newbeta*218)>>8;
+        var newr = newb+newalpha+(newbeta*37837>>16);
+        var newg = newb+(newbeta*75674>>16);
+        buff8[k]   = newr;
+        buff8[k+1] = newg;
+        buff8[k+2] = newb;
+        
+        var j = (256+newalpha)+((256+newbeta)<<9);
+        hdat[j] = buff32[i];
+        if (i%100000==0) {
+            print('alpha='+alpha);
+            print('beta='+beta);
+            print('newalpha='+newalpha);
+            print('newbeta='+newbeta);
+            print('r='+r);
+            print('g='+g);
+            print('b='+b);
+            print('newr='+newr);
+            print('newg='+newg);
+            print('newb='+newb);
+        }
+    }
+    
+    for (var i=0; i<1<<18; i++) hdat[i]|=0xff000000;
+    for (var i=0; i<512;   i++) hdat[i+256*512]=hdat[i*512+256]=0xff0000ff;
+    ccxt.putImageData(imageData, 0, 0);
+    /* blit to screen */
+    hid.data.set(hb8);
+    hcxt.putImageData(hid,0,0);
+}
+
+var imageObj = new Image();
+imageObj.onload = function() {
+    drawImage(this);
+};
+
+//imageObj.src = 'hw.png';
+imageObj.src = 'small.jpg';
+//imageObj.src = 'PxAx3uO.jpg';
+</script>
+</body>
+</html>    

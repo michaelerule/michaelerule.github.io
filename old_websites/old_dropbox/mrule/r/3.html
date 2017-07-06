@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+
+<head> 
+<link href="../style.css" rel="stylesheet" type="text/css">
+<title>dbpq</title>
+</head>
+<body>
+
+<script type="text/javascript">
+imgs=["1.gif", "2.gif", "3.gif", "5.gif", "6.gif", "7.gif", "frame 11.gif", "perceptron2.gif", "perceptron3-3.gif", "perceptron4.gif", "perceptron.gif"];
+var x=0;
+function next() {
+    x=(x+1)%imgs.length;
+    document.getElementById("imgloop").src=imgs[x];
+}
+</script>
+
+<div class="navboxen">
+<div class="hiddenavbox"><a href="../enigma.html"> </a></div>
+<div class="navbox"><a href="http://www.physics.gla.ac.uk/Optics/play/fractalVideoFeedback/research.html"> </a><div class="info">Fractal Video Feedback I</div></div>
+<div class="navbox"><a href="http://sweetandfizzy.com/fractals/index.html"> </a><div class="info">Fractal Video Feedback II</div></div>
+</div>
+
+<p class="block">
+<img src="../clicktostart.png" width="512px" id="imgloop" alt="" onmousedown="next()">
+</p>
+<img src="1.gif" width="0px">
+<img src="2.gif" width="0px">
+<img src="3.gif" width="0px">
+<img src="5.gif" width="0px">
+<img src="6.gif" width="0px">
+<img src="7.gif" width="0px">
+<img src="frame 11.gif" width="0px">
+<img src="perceptron2.gif" width="0px">
+<img src="perceptron3-3.gif" width="0px">
+<img src="perceptron4.gif" width="0px">
+<img src="perceptron.gif" width="0px">
+</body>
+
+
+
+

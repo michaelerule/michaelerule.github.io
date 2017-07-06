@@ -1,0 +1,45 @@
+    /* Next we compute the remainder of the top padding. Each row of the 
+       top padding has three parts: the left padding, the main part, and
+       the right padding. The structure of the code here is a bit
+       naughty but it preserves the symmetry with the block above which
+       I think is useful for comprehension. l is a running accumulator
+       for the row. It needs to be update before we compute the acc value */
+    for (var y=1;y<s;y++) {
+        var l=0.0;
+        var i    = w*(h-s+y);
+        var aci0 = wa*y;
+        var aci1 = aci0-wa;
+        for (var x=0;x<s;x++) acc[x+aci0] = acc[x+aci1] + (l+=data[(w-s+x) + i]);
+        aci0 += s; aci1 += s;
+        for (var x=0;x<w;x++) acc[x+aci0] = acc[x+aci1] + (l+=data[     x  + i]);
+        aci0 += w; aci1 += w;
+        for (var x=0;x<r;x++) acc[x+aci0] = acc[x+aci1] + (l+=data[     x  + i]);
+    }
+    
+    /* If all is well, we should now have the top padding covered. 
+       The bulk of the rest only has to worry about left and right padding */
+    for (var y=0;y<h;y++) {
+        var l=0.0;
+        var i    = w*y;
+        var aci0 = wa*(y+s);
+        var aci1 = aci0-wa;
+        for (var x=0;x<s;x++) acc[x+aci0] = acc[x+aci1] + (l+=data[(w-s+x) + i]);
+        aci0 += s; aci1 += s;
+        for (var x=0;x<w;x++) acc[x+aci0] = acc[x+aci1] + (l+=data[     x  + i]);
+        aci0 += w; aci1 += w;
+        for (var x=0;x<r;x++) acc[x+aci0] = acc[x+aci1] + (l+=data[     x  + i]);
+    }
+    
+    /* The final copy */
+    for (var y=0;y<r;y++) {
+        var l=0.0;
+        var i    = w*y;
+        var aci0 = wa*(y+h+s);
+        var aci1 = aci0-wa;
+        for (var x=0;x<s;x++) acc[x+aci0] = acc[x+aci1] + (l+=data[(w-s+x) + i]);
+        aci0 += s; aci1 += s;
+        for (var x=0;x<w;x++) acc[x+aci0] = acc[x+aci1] + (l+=data[     x  + i]);
+        aci0 += w; aci1 += w;
+        for (var x=0;x<r;x++) acc[x+aci0] = acc[x+aci1] + (l+=data[     x  + i]);
+    }
+    

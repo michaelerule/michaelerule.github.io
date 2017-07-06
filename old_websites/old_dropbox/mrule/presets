@@ -1,0 +1,77 @@
+
+flicker_presets = [
+    ['spots'    ,'randomize','Aei=8.5;Aii=3;Ti=20;Hi=3.5;Gi=0;Si=2;Aee=10;Aie=12;Te=10;He=2;Ge=0.8;Se=0.8;dt=1;Amp=0.7;T=125;'],
+    ['stripe I' ,'randomize','Aei=8.5;Aii=3;Ti=20;Hi=3.5;Gi=0;Si=2;Aee=10;Aie=12;Te=10;He=2;Ge=0.8;Se=0.8;dt=1;Amp=0.35;T=60;'],
+    ['stripe II','randomize','Aei=8.5;Aii=3;Ti=20;Hi=3.5;Gi=0;Si=2;Aee=10;Aie=12;Te=10;He=2;Ge=0.8;Se=0.8;dt=1;Amp=1.50;T=50;']];
+    
+    }
+    function spirals() {
+        loadstring('Aei=8;Aii=5;Ti=12;Hi=2;Gi=0;Ni=0;Si=1;Aee=16;Aie=10;Te=1;He=4;Ge=0;Ne=0;Se=1;dt=1;Amp=0;T=125;');
+    }
+    function bumps() {
+        loadstring('Aei=8.5;Aii=3;Ti=30;Hi=3.5;Gi=0;Ni=0;Si=2.4;Aee=14;Aie=12;Te=10;He=3;Ge=0.8;Ne=0;Se=1;dt=1;Amp=0;T=60;');
+    }
+    function stripes() {
+        loadstring('Aei=8;Aii=5;Ti=16;Hi=4;Gi=0;Ni=0;Si=8;Aee=12;Aie=10;Te=1;He=2.5;Ge=0;Ne=0;Se=0.8;dt=1;Amp=0;T=125;');
+    }
+    function oscillatingspots() {
+        loadstring('Aei=40;Aii=16;Ti=6;Hi=3.5;Gi=0;Ni=0;Si=3;Aee=25;Aie=20;Te=1;He=2;Ge=0.8;Ne=0;Se=1;dt=.1;Amp=0;T=125;');
+    }
+    function growing() {
+        loadstring('Aei=8;Aii=5;Ti=16;Hi=2;Gi=0;Ni=0;Si=6;Aee=14.7;Aie=10;Te=1;He=3.8;Ge=0;Ne=0;Se=1.5;dt=1;Amp=0;T=125;');
+    }
+    function bubbles() {
+        loadstring('Aei=8.5;Aii=3;Ti=45;Hi=3.5;Gi=0;Ni=0;Si=2.4;Aee=14;Aie=12;Te=10;He=3;Ge=0.8;Ne=0;Se=1;dt=2;Amp=0;T=60;');
+    }
+    function oscillatingstripes() {
+        loadstring('Aei=8.5;Aii=3;Ti=45;Hi=3.5;Gi=0;Ni=0;Si=2.4;Aee=14.8;Aie=14;Te=10;He=3;Ge=0.8;Ne=0;Se=1;dt=2;Amp=0;T=60;');
+    }
+	function division() {
+	    loadstring('Aei=8.5;Aii=3;Ti=50;Hi=3.5;Gi=0;Si=5;Aee=14;Aie=12;Te=10;He=3.2;Ge=0.8;Se=1.5;dt=7;Amp=0;T=60;');
+    }   
+	function cables() {
+	    loadstring('Aei=8.5;Aii=3;Ti=10;Hi=3.5;Gi=0;Si=5;Aee=14;Aie=12;Te=10;He=3.2;Ge=0.8;Se=1.5;dt=10;Amp=0;T=60;');
+    }
+	
+tiny black cables circuit board
+Aei=10;Aii=0;Ti=2;Hi=6;Gi=0;Si=3;Aee=15;Aie=14;Te=1;He=1;Ge=0;Se=1;dt=1;display_every=3;Amp=0;T=125;
+
+stair grower
+Aei=10;Aii=0;Ti=3;Hi=6;Gi=0;Si=8;Aee=16;Aie=14;Te=1;He=4;Ge=0;Se=0.9;dt=1;display_every=1;Amp=0;T=125;
+
+soap film decay white fine
+Aei=6.5;Aii=3;Ti=10;Hi=3.5;Gi=0;Si=1.5;Aee=14;Aie=12;Te=10;He=3.25;Ge=0.8;Se=1;dt=3;display_every=3;Amp=0;T=60;
+
+soap bubbles course
+Aei=6.5;Aii=3;Ti=10;Hi=3.5;Gi=0;Si=2.25;Aee=14;Aie=12;Te=10;He=3.29;Ge=0.8;Se=1.5;dt=8;display_every=3;Amp=0;T=60;
+
+mixed temporal / spatial instability: stripes
+Aei=8.5;Aii=3;Ti=40;Hi=3.5;Gi=0;Si=2.4;Aee=15;Aie=12;Te=10;He=3;Ge=0.8;Se=1;dt=2;display_every=1;Amp=0;T=60;
+
+initially mixed temporal / sptial, decays to bubble-like 
+Aei=8.5;Aii=3;Ti=35;Hi=3.5;Gi=0;Si=2.2;Aee=15;Aie=12;Te=10;He=3;Ge=0.8;Se=1;dt=2;display_every=1;Amp=0;T=60;
+
+fine spirals
+Aei=8.5;Aii=3;Ti=45;Hi=3.5;Gi=0;Si=0.8;Aee=14;Aie=12;Te=5;He=2.5;Ge=0.8;Se=0.8;dt=1;display_every=1;Amp=0;T=60;
+
+nucleating hexagons in oscillatory background
+Aei=8.5;Aii=3;Ti=5;Hi=3.5;Gi=0;Si=1.25;Aee=14;Aie=12;Te=5;He=2.5;Ge=0.8;Se=0.8;dt=1;display_every=1;Amp=0;T=60;
+
+mixed temporal / spatial instability: hexagons
+Aei=8.5;Aii=3;Ti=7;Hi=3.5;Gi=0;Si=1.425;Aee=14;Aie=12;Te=5;He=2.5;Ge=0.8;Se=0.8;dt=1;display_every=1;Amp=0;T=60;
+
+space race, fine, underactive. forms cables similar to slow grow space race
+Aei=8.5;Aii=3;Ti=7;Hi=3;Gi=0;Si=1.6;Aee=16;Aie=12;Te=3;He=3.0225;Ge=0.8;Se=1;dt=1;display_every=1;Amp=0;T=60;
+
+black cables
+Aei=8.5;Aii=3;Ti=7;Hi=3;Gi=0;Si=3.2;Aee=16;Aie=12;Te=3;He=2.9;Ge=0.8;Se=2;dt=1;display_every=1;Amp=0;T=60;
+
+wigglies
+Aei=8.5;Aii=3;Ti=7;Hi=3;Gi=0;Si=3.2;Aee=16;Aie=12;Te=3;He=2.95;Ge=0.8;Se=2;dt=1;display_every=1;Amp=0;T=60;
+
+spongy / coralgrow (seed it)
+Aei=8.5;Aii=3;Ti=7;Hi=3;Gi=0;Si=3.2;Aee=16;Aie=12;Te=3;He=3.0225;Ge=0.8;Se=1;dt=1;display_every=1;Amp=0;T=60;
+
+cool grower related to wiggles. (seed it)
+Aei=8.5;Aii=3;Ti=7;Hi=3;Gi=0;Si=2.8;Aee=16;Aie=12;Te=3;He=3.0225;Ge=0.8;Se=1.5;dt=1;display_every=1;Amp=0;T=60;
+

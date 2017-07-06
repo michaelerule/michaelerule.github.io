@@ -1,0 +1,271 @@
+<html>
+<head>
+<script src="math.js" type="text/javascript"></script>
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css">
+.item { 
+    -moz-user-select: -moz-none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+}
+div {
+width: 100%; 
+height: 100%;
+padding: 0;
+margin:0;
+position: absolute; 
+top: 0; 
+right: 0; 
+bottom: 0; 
+left: 0;} 
+* { margin:0; padding:0; }
+</style>
+
+</head>
+<body onload="perceptron()" bgcolor="#000">
+<canvas id="canvas" width="1" height="1">Sorry, your browser does not support JavaScript canvas, or it is disabled.</canvas>
+<script type="application/javascript">
+
+/** As far a I can tell this is how you do println in Javascript? */
+function print(msg){setTimeout(function(){throw new Error(msg);},0);}
+
+function perceptron(){
+    print('loading');
+
+    var MAPFIXEDP = 16;
+    var W  = window.innerWidth;//640;
+    var H  = window.innerHeight;//480;
+    var W2 = W/2;
+    var H2 = H/2;
+    print(W);
+    print(H);
+    var CMASK = 0xf0f0f0;
+
+    /* prepare canvas */
+    var canvas = document.getElementById('canvas');
+    canvas.width  = W; 
+    canvas.height = H; 
+    var ctx = canvas.getContext('2d');
+    var imageData = ctx.getImageData(0,0,W,H);
+    canvas.onselectstart = function(){return false;}
+    canvas.className = "item"
+
+    /* prepare cursors */
+    cursor_radius = 10;
+    var cursor1 = document.createElement("div");
+    document.body.appendChild(cursor1);
+    cursor1.style = 'border-radius:50%;';
+    cursor1.style['border-radius']='50%';
+    cursor1.style.background='#0F0';
+    cursor1.style.position='absolute';
+    cursor1.style.width  = 2*cursor_radius;
+    cursor1.style.height = 2*cursor_radius;
+    cursor1.style.top    = canvas.offsetTop+H2;
+    cursor1.style.left   = canvas.offsetLeft+W2;
+    cursor1.onselectstart = function(){return false;}
+    cursor1.className = "item"
+    
+    var cursor2 = document.createElement("div");
+    document.body.appendChild(cursor2);
+    cursor2.style = 'border-radius:50%;';
+    cursor2.style['border-radius']='50%';
+    cursor2.style.background='#F00';
+    cursor2.style.position='absolute';
+    cursor2.style.width  = 2*cursor_radius;
+    cursor2.style.height = 2*cursor_radius;
+    cursor2.style.top    = canvas.offsetTop+H2/2;
+    cursor2.style.left   = canvas.offsetLeft+W2;
+    cursor2.onselectstart = function(){return false;}
+    cursor2.className = "item"
+    
+    /* Prepare cursor interactivity hooks */
+    var cursor_selected = null;
+	document.onmouseup  = function(e) {cursor_selected = null;}
+    cursor1.onmousedown = function(e) {cursor_selected = cursor1;}
+    cursor2.onmousedown = function(e) {cursor_selected = cursor2;}
+	document.onmousemove = function(e) {
+		if (cursor_selected) {
+			var x = e.pageX-canvas.offsetLeft;
+			var y = e.pageY-canvas.offsetTop;
+			x = Math.min(W-cursor_radius,x);
+			y = Math.min(H-cursor_radius,y);
+			x = Math.max(cursor_radius,x);
+			y = Math.max(cursor_radius,y);
+			cursor_selected.style.top  = y + canvas.offsetTop  - cursor_radius;
+			cursor_selected.style.left = x + canvas.offsetLeft - cursor_radius;
+		}
+	}
+	
+	var colormap=new Uint32Array(256);
+	for(var i=0;i<256;i++){
+	    var hue=6.0*i/256;
+	    var r=0;
+	    var g=0;
+	    var b=0;
+	    var C=255;//-(i*i>>8);
+	    if(hue<1){r+=C;g+=C*hue;}
+        else if(hue<2){r+=C*(2-hue);g+=C;}
+        else if(hue<3){g+=C;b+=C*(hue-2);}
+        else if(hue<4){g+=C*(4-hue);b+=C;}
+        else if(hue<5){r+=C*(hue-4);b+=C;}
+        else{r+=C;b+=C*(6-hue);}
+        r=Math.round(r);
+        g=Math.round(g);
+        b=Math.round(b);
+        colormap[i]=((((r<<16)|(g<<8)|b)&0xffffff));
+    }
+    
+    /* prepare recurrence map */
+    var map  = new Int32Array( W*H*2 );
+    for (var y = 0; y < H; ++y) {
+        for (var x = 0; x < W; ++x) {
+            var real   = (x-W2)*4.0/W;
+            var imag   = (y-H2)*4.0/H;
+            //var real2  = 0.5*(real*real-imag*imag);
+            //var imag2  = 0.5*(2*real*imag);
+            var real2  = real;
+            var imag2  = imag;
+            
+            /*
+			var r = Math.sqrt(real*real+imag*imag);
+			r = r*r;//Math.sin(r);//Math.sqrt(H2*W2);
+			var h = Math.atan2(imag,real);
+			var real2 = r*Math.cos(h);
+			var imag2 = r*Math.sin(h);
+            */
+            /*
+            var z = math.complex(real,imag);
+			z = math.divide(math.pow(z,1),math.add(math.pow(z,4),100));
+            var real2 = z.re*100.0;
+			var imag2 = z.im*100.0;
+            */
+            var x2     = Math.round((real2*W/4+W2)*MAPFIXEDP);
+            var y2     = Math.round((imag2*H/4+H2)*MAPFIXEDP);
+            var index  = y*W + x;
+            /* Note: we subtract an 8-bit fixed point version of N from 
+            the coodinates in order to put the origin at the center of 
+            the canvas. This allows us to rotate these coordinates 
+            without additional shifts beforehand */
+            map[index*2  ] = x2-W2*MAPFIXEDP;
+            map[index*2+1] = y2-H2*MAPFIXEDP;
+        }
+    }
+    var buff1 = new Uint32Array( W*H + 1);
+    var buff2 = new Uint32Array( W*H + 1);
+
+    offsetx  = 0;
+    offsety  = 0;
+    costheta = 0;
+    sintheta = 0;
+        
+    var data = new Uint32Array(imageData.data.buffer);
+    var huetic = 0;
+
+	var running = true;
+	var downX = null; 
+	var downY = null;
+    
+    function render() {
+        
+        /* Load the cursor locations and set the camera parameters 
+        accordingly*/
+        y1 = cursor1.offsetTop -canvas.offsetTop -H2+cursor_radius;
+        x1 = cursor1.offsetLeft-canvas.offsetLeft-W2+cursor_radius;
+        offsetx = -x1*16;
+        offsety = -y1*16;
+        
+        y2 = cursor2.offsetTop -canvas.offsetTop -H2+cursor_radius;
+        x2 = cursor2.offsetLeft-canvas.offsetLeft-W2+cursor_radius;
+        mouseTheta  = Math.atan2(x2,y2);
+        mouseRadius = Math.round(256*256/Math.sqrt(x2*x2+y2*y2));/* what is this for? */
+        costheta    = Math.cos(mouseTheta)*mouseRadius;
+        sintheta    = Math.sin(mouseTheta)*mouseRadius;
+        
+        /* We seed a weak RNG with a strong RNG. This gives us good speed
+         and also decent randomness */
+        var rand = Math.floor(Math.random()*0x1000000);
+        
+        for (var y = 4; y < H-4; ++y)
+        for (var x = 4; x < W-4; ++x) {
+            var index  = y*W + x;
+            var x2 = map[index*2  ] + offsetx;
+            var y2 = map[index*2+1] + offsety;
+            /* Using 8-bit fixed point, apply a rotation to x2 and y2 */
+            /* After the rotation, apply the offset */
+            var x3 = (costheta * x2 + sintheta * y2 >> 8) + W2*MAPFIXEDP;
+            var y3 = (costheta * y2 - sintheta * x2 >> 8) + H2*MAPFIXEDP;
+            var xi = x3>>4;
+            var yi = y3>>4;
+            var xf = x3 & 0xf;
+            var yf = y3 & 0xf
+            var xj = xi;
+            var yj = yi;
+            var s = 0;
+            while (xj< 0) {xj+=W; s=1-s;}
+            while (xj>=W) {xj-=W; s=1-s;}
+            while (yj< 0) {yj+=H; s=1-s;}
+            while (yj>=H) {yj-=H; s=1-s;}
+            var colorA = buff1[(xj +yj*W)];
+            var xj2 = xj+1;
+            if (xj2>=W) xj2-=W;
+            var colorB = buff1[(xj2+yj*W)];
+            yj += 1;
+            if (yj>=H) yj-=H;
+            var colorC = buff1[(xj +yj*W)];
+            var colorD = buff1[(xj2+yj*W)];
+            var colorE = (15-xf)*colorA+xf*colorB;
+            var colorF = (15-xf)*colorC+xf*colorD;
+            var color  = (15-yf)*colorE+yf*colorF >> 8;
+            
+            //color = (color+1)<<1;
+            //if (!(xi>=0 && yi>=0 && xi<W && yi<H))
+            //if ((xi%W)&1==(yj%H)&1)
+            if (s)
+                color = (1+color)*257>>7;
+            if (color>0xff) color=0xff;
+            if (color<0) color=0;
+            buff2[index] = color;
+
+            data[index] = 0xff000000 | (color&0xff)*0x010101;
+        }
+        
+        /* blit to screen */
+        ctx.putImageData(imageData, 0, 0);
+        
+        var temp = buff2;
+        buff2 = buff1;
+        buff1 = temp;
+        
+        /** Apparently animations loops live in the event thread like so*/
+        if (running) setTimeout(render, 50);
+    }
+    
+	document.onmousedown = function(e) {
+		downX = e.pageX;
+		downY = e.pageY;
+	}
+	document.onclick = function(e) {
+		if (downX==e.pageX && downY==e.pageY) {
+			if (running) {
+				running=false;
+				print('stopping');
+			}
+			else {
+				running=true;
+	    		setTimeout(render,0);
+				print('starting');
+			}
+		}
+	}
+    
+    print('starting');
+    /** Apparently animations loops live in the event thread like so*/
+    setTimeout(render, 0);
+}
+
+</script>
+
+</body>
+</html>

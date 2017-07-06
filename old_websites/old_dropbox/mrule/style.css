@@ -1,0 +1,116 @@
+
+
+BODY { 
+  height:100%; 
+  font-size: 95%; 
+  color:#403818 
+  background-color:#fff;
+}
+
+.navboxen {
+    position:absolute;
+    top:10px;left:10px;
+    float:left;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.infobox {
+    position:absolute;
+    top:90px;left:57px;
+    float:left;
+    font-size:9pt;
+    font-family:sans-serif;
+    color:#555;
+}
+
+div.navbox a {
+  height: 37px;
+  width: 37px;
+  display: block;
+  background: #ddd;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #ddd;
+}
+
+div.navbox a:hover {
+  background: #ffffff;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #eee;
+}
+
+div.navbox div.info {
+    position: absolute; 
+    left: -9999px; 
+}
+
+div.navbox:hover div.info {
+    position: absolute;
+    left:57px;  
+    top:10px;  
+    width:200px;
+    background: #fff;
+    text-align: left;
+    vertical-align: top;
+    font-size:9pt;
+    font-family:sans-serif;
+    color:#555;
+}
+
+div.navboxen div.navbox:hover div.info {
+    position: absolute;
+    left:57px;  
+    top:0px;  
+    width:100px;
+    background: #fff;
+    text-align: left;
+    vertical-align: top;
+    font-size:9pt;
+    font-family:sans-serif;
+    color:#555;
+} 
+
+.hiddenavbox a {
+  height: 37px;
+  width: 37px;
+  display: block;
+  background: #eee;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #eee;
+}
+
+.hiddenavbox a:hover {
+  background: #ffffff;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #eee;
+}
+
+p.block {
+  text-align:center;
+  margin-top: 101px;
+  background: #fff;
+}
+
+#navtable {
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 101px;
+  width: 148px;
+  height: 74px;
+  border-spacing: 0px;
+  border-collapse: collapse;
+}
+
+#ctrimg {
+  margin-top: 101px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  border: 0;
+}
+
+
