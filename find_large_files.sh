@@ -33,7 +33,9 @@ done
 
 echo -e $output | column -t -s ', '
 
-#git filter-branch --index-filter "git rm -rf --cached --ignore-unmatch 20170418_Rule_ANC_Edinburgh_talk.pdf" HEAD
-#git filter-branch --index-filter "git rm -rf --cached --ignore-unmatch RuleEtAl_SfN2015_11.pdf" HEAD
-
+git filter-branch -f --index-filter "git rm -rf --cached --ignore-unmatch 20170418_Rule_ANC_Edinburgh_talk.pdf" HEAD
+git filter-branch -f --index-filter "git rm -rf --cached --ignore-unmatch RuleEtAl_SfN2015_11.pdf" HEAD
+git filter-branch -f --index-filter "git rm -rf --cached --ignore-unmatch out0.gif" HEAD
+git filter-branch -f --index-filter "git rm -rf --cached --ignore-unmatch 3.gif" HEAD
+git filter-branch -f --index-filter "git rm -rf --cached --ignore-unmatch __get_url_as_soup_cache.zip" HEAD
 
