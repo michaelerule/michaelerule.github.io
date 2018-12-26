@@ -1,0 +1,238 @@
+\documentclass[svgnames,13pt,handout]{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[greek,english]{babel}
+\usepackage{textgreek}
+\usefonttheme[onlymath]{serif}
+\usetheme{Singapore}
+\usecolortheme[RGB={50,104,20}]{structure}
+%\setbeamertemplate{frametitle}[default][left]
+\usepackage{verbatim}
+\usepackage{eso-pic}
+\usepackage{color}
+\usepackage[autoplay,loop]{animate}
+\usepackage{grffile}
+\definecolor{emphasizecolor}{RGB}{255,69,0}
+\graphicspath{{../common_media/}{./media/}}
+\newcommand\fontvi{\fontsize{14}{15}\selectfont}
+\newcommand {\framedgraphic}[3] {
+	\begin{frame}{#1}
+		\begin{center}
+			\includegraphics[width=\textwidth,height=#3\textheight,keepaspectratio]{#2}
+		\end{center}
+	\end{frame}
+}
+\makeatletter
+\let\beamer@writeslidentry@miniframeson=\beamer@writeslidentry
+\def\beamer@writeslidentry@miniframesoff{%
+  \expandafter\beamer@ifempty\expandafter{\beamer@framestartpage}{}% does not happen normally
+  {%else
+    % removed \addtocontents commands
+    \clearpage\beamer@notesactions%
+  }
+}
+
+% math voodo... just want bold math to work
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{eucal}
+\usepackage{amssymb}
+\usepackage{mathrsfs}
+
+% footnotes too big
+\let\oldfootnotesize\footnotesize
+\renewcommand*{\footnotesize}{\oldfootnotesize\TINY}
+
+\newcommand*{\miniframeson}{
+    \let\beamer@writeslidentry=\beamer@writeslidentry@miniframeson
+}
+\newcommand*{\miniframesoff}{
+    \let\beamer@writeslidentry=\beamer@writeslidentry@miniframesoff
+}
+\makeatother
+\makeatletter
+\DeclareRobustCommand{\emph}[1]{\textbf{{\color{emphasizecolor} #1}}}
+\makeatother
+
+\newcommand{\argmin}{\operatornamewithlimits{argmin}}
+
+\begin{document}
+
+
+\title   {Review of generalized linear point-process models}
+\author  {Neurostats club 2015}
+\subtitle{}
+\date    {\today}
+\begin{frame} \titlepage \end{frame}
+%_____________________________________________________________________________
+\begin{frame}{}
+\begin{center}
+	\large This will be quick\\
+	No formal derivations
+\end{center}
+\end{frame} 
+
+
+%_____________________________________________________________________________
+\begin{frame}{Linear model / multiple linear regression}
+\[y = \beta_o + \beta_1 \cdot x_1 + \beta_2 \cdot x_2 + ... = \beta_o + \sum_{i=1}^N x_i \beta_i \ = XB + \beta_o\]
+\begin{itemize}
+	\item \emph{$y$}: response/dependent variable being modeled (when multivariate, often a column vector by convention)
+	\item \emph{$X$}: ``design matrix'' matrix of observations. Conventionally, each row is a realization and each column is a feature/variable
+	\item \emph{$B$}: Coefficient or parameter vector
+	\item \emph{$\beta_o$}: Constant term. (can skip if $X$ contains a constant column)
+\end{itemize}
+\end{frame} 
+
+%_____________________________________________________________________________
+\begin{frame}{Nonlinear features OK}
+\begin{itemize}
+	\item Features $(x_1,x_2,...)$ can be any function of recorded data. E.g. the following model is common for phase/direction tuning
+	\end{itemize}
+\[y = \beta_o + A\cdot cos(\varphi-\varphi_o)\]
+\vspace{-2em}
+\begin{itemize}
+	\item <2->\emph{$A$}: amplitude parameter
+	\item <3->\emph{$\varphi$}: the observed phase or direction
+	\item <4->\emph{$\varphi_o$}: preferred phase parameter
+	\item <5->Can be written in a form that is linear in parameters
+	\end{itemize}
+	\[y = \beta_o + \beta_1 cos(\varphi) + \beta_2 sin(\varphi)\]
+\end{frame} 
+
+%_____________________________________________________________________________
+\begin{frame}{GLM point process model for single unit spiking with ensemble history}
+\[\log[\lambda(t_k|\mathcal{H}_{tk})\Delta] = \mu + \text{\emph{intrinsic history}}
++ \text{\emph{ensemble history}}
++ \text{\emph{extrinsic covariates}}\]
+\end{frame} 
+
+%_____________________________________________________________________________
+\begin{frame}{Generalized linear model: nonlinearity on the response variable}
+\[F(y) = XB\]
+\begin{itemize}
+	\item Can be fit with iteratively reweighted least squares 
+	\begin{itemize}
+		\item MATLAB glmfit \href{http://www.mathworks.com/help/stats/glmfit.html}{\beamergotobutton{Link}}
+		\item Python scikits.statsmodels.GLM \href{http://statsmodels.sourceforge.net/stable/glm.html}{\beamergotobutton{Link}} 
+	\end{itemize}
+\end{itemize}
+\end{frame} 
+
+%_____________________________________________________________________________
+\begin{frame}{Point-process GLM: point-like or binary observations}
+\begin{itemize}
+	\item Response variable $y$ is either $0$ or $1$
+	\item Poisson case takes the form
+	\end{itemize}
+\[\ln(\lambda) = \mu + XB\]
+\begin{itemize}
+	\item Assumes that the process $y$ is inhomogeneous Poisson
+	\item The probability of observing $k$ spikes in a time interval $\Delta$ is Poisson distributed
+	\end{itemize}
+\[\Pr\left(\int_t^{t+\Delta}\lambda(t)dt = k\right) \approx (\Delta \lambda(t))^k \frac{ e^{-\Delta \lambda(t)}}{k!}\]
+\end{frame} 
+
+%_____________________________________________________________________________
+\begin{frame}{Poisson point-process GLM for spike trains: Poisson case}
+\begin{itemize}
+	\item Fit the model by finding the parameters $\mu$, $B$ that maximize the likelihood $\mathcal{L}(\mu,B|y,X) = \Pr(y,X|\mu,B)$ of the observations
+	\end{itemize}
+\[\Pr(y,X|\mu,B) = \prod_t \lambda_t^{y_t} e^{-\lambda_t} / {y_t}! \]
+\[\ln(\lambda_t) = \mu + X_t B\quad i.e.\quad \lambda_t=exp(\mu + X_t B)\]
+\begin{itemize}
+	\item In practice, minimize the negative log-likelihood
+	\end{itemize}
+\[\argmin_{\mu,B}[ -\ln\mathcal{L}(\mu,B|y,X) ]= \argmin_{\mu,B} \sum_t[ \lambda_t - \ln(y_t!) - y_t \ln(\lambda_t) ]\]
+\end{frame} 
+
+%_____________________________________________________________________________
+\begin{frame}{Poisson point-process GLM for spike trains: Poisson case}
+\begin{itemize}
+	\item Choose $\Delta$ sufficiently small such that $\sum_{y=t}^{t+\Delta}y_t$ is always $0$ or $1$
+	\item The negative log-likelihood simplified since $\ln(y_t!)$ is always 0
+	\end{itemize}
+\[\argmin_{\mu,B} \sum_t[  \lambda_t - y_t \ln(\lambda_t) ]\]
+\begin{itemize}
+	\item Substituting in the expression for $\lambda_t$
+	\end{itemize}
+\[\argmin_{\mu,B} \sum_t[  e^{\mu + X_t B} - y_t (\mu + X_t B) ]\]
+\begin{itemize}
+	\item Or as I personally prefer (closer to the code implementation)
+	\end{itemize}
+\[\argmin_{\mu,B} \sum_t  e^{\mu + X_t B} - \sum_{t\text{ if }y_t=1} (\mu + X_t B)\]
+\end{frame} 
+
+%_____________________________________________________________________________
+\begin{frame}{Poisson point-process GLM for spike trains: Likelihood function and gradients}
+\[\ln\mathcal{L}(\mu,B|y,X) = \prod_t \begin{cases} y_t=0 \& e^{-\lambda_t} \\ y_t=1 \& \lambda_t e^{-\lambda_t} \end{cases} \]
+\[\ln\mathcal{L}(\mu,B|y,X) = \sum_t \begin{cases} y_t=0 \& -\lambda_t \\ y_t=1 \& \ln(\lambda_t) - \lambda_t \end{cases} \]
+\end{frame} 
+
+
+%_____________________________________________________________________________
+\begin{frame}{Regularized GLM }
+Cross-validation is necessary to assess over-fitting: 
+\begin{itemize}
+	\item data should be separated into training and testing sets
+	\end{itemize}
+For larger number of parameters, the model can overfit:
+\begin{itemize}
+	\item regularization is necessary. 
+	\end{itemize}
+Regularization can be incorporated by adding a penalty term to the likelihood function
+\end{frame} 
+
+%_____________________________________________________________________________
+\begin{frame}{Regularized GLM }
+L2 penalty: Parameters penalized by their squared magnitudes
+\begin{itemize}
+	\item Equivalent to a Gaussian prior on parameters
+	\item Can be solved with gradient descent
+	\end{itemize}
+\[ {\color{emphasizecolor} \alpha \sum_{i=1}^N \beta_i^2 }\]
+L1 penalty: Parameters penalized by their absolute magnitude
+\begin{itemize}
+	\item Promotes $\beta_i=0$, useful for finding sparse solutions
+	\item Discontinuous gradient at $\beta_i=0$ percludes gradient descent. 
+	\end{itemize}
+\[ {\color{emphasizecolor} \alpha \sum_{i=1}^N |\beta_i| }\]
+\end{frame} 
+
+%_____________________________________________________________________________
+\begin{frame}{Regularized GLM }
+~$\sqrt{x^2+\epsilon}:$ Smooth approximation of L1 penalty that is suitable for gradient descent\footnote{Called "Charbonnier penalty" in the computer vision literature (Charbonnier et al. 1994)}
+\begin{itemize}
+	\item $\epsilon$ is chosen to be small, but strictly positive
+	\end{itemize}
+\[ {\color{emphasizecolor} \alpha \sum_{i=1}^N \sqrt{\beta_i^2+\varepsilon} }\]
+L0 penalty: Constant penalty if a parameter is nonzero
+\begin{itemize}
+	\item Computationally infeasible
+	\item Greedy algorithms are the best polynomial time approximation
+	\end{itemize}
+\[ {\color{emphasizecolor} \alpha \sum_{i=1}^N \delta(\beta_i\ne 0) }\]
+\end{frame} 
+
+%_____________________________________________________________________________
+\begin{frame}{Tips and tricks for fitting the GLM:}
+\begin{itemize}
+	\item The strength of regularization $\alpha$ is another free parameter
+	\begin{itemize}
+		\item Can be fixed arbitarily or...
+		\item Two-level crossvalidation can be used to estimate $\alpha$ from the data
+	\end{itemize}
+\end{itemize}
+\end{frame} 
+
+
+%#############################################################################
+%#############################################################################
+%#############################################################################
+\appendix\newcounter{finalframe}
+\setcounter{finalframe}{\value{framenumber}}
+\setcounter{framenumber}{\value{finalframe}}
+
+
+
+\end{document}

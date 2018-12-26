@@ -1,0 +1,359 @@
+Review of generalized linear point-process models
+Neurostats club 2015
+
+
+
+#############################################################################
+$Introduction
+$$
+
+@
+{center}
+    \large This will be quick\\
+    No formal derivation\\
+    No proofs
+
+
+@Truccolo et al. 2005
+{overprint}
+    \onslide<1>
+        Derivation of point process GLM
+        Intrinsic and ensemble history models
+        Maximum likelihood estimation
+        Non-GLM conditional intensity model
+        KS test and time rescaling
+        Residual analysis
+        Model selection
+        Decoding
+    \onslide<2>
+        Derivation of point process GLM
+        \emph{Intrinsic and ensemble history models}
+        \emph{Maximum likelihood estimation}
+        Non-GLM conditional intensity model
+        KS test and time rescaling
+        Residual analysis
+        Model selection
+        Decoding
+    \onslide<3,4>
+        Derivation of point process GLM
+        \emph{Intrinsic and ensemble history models}
+        \emph{Maximum likelihood estimation}
+        Non-GLM conditional intensity model
+        KS test and time rescaling
+        Residual analysis
+        Model selection
+        Decoding
+        \emph{Take NEUR2110 with Wilson Truccolo in the spring!}
+{overprint}
+    \onslide<4>
+    If there is time:
+        Closed form approximation, double crossvalidation, regularization, and regularization paths
+
+#############################################################################
+    
+@Linear model / multiple linear regression
+\[y = \beta_o + \beta_1 \cdot x_1 + \beta_2 \cdot x_2 + ... = \beta_o + \sum_{i=1}^N x_i \beta_i \ = XB + \beta_o\]
+    \emph{$y$}: response/dependent variable being modeled (when multivariate, often a column vector by convention)
+    \emph{$X$}: ``design matrix'' matrix of observations. Conventionally, each row is a realization and each column is a feature/variable
+    \emph{$B$}: Coefficient or parameter vector
+    \emph{$\beta_o$}: Constant term.
+
+@Nonlinear features OK
+    Features $(x_1,x_2,...)$ can be any function of recorded data. E.g. the following model is common for phase/direction tuning (used in eqn. 10 in Truccolo et al. 2005)
+\[y = \beta_o + A\cdot cos(\varphi-\varphi_o)\]
+\vspace{-2em}
+    <2->\emph{$A$}: amplitude parameter
+    <3->\emph{$\varphi$}: the observed phase or direction
+    <4->\emph{$\varphi_o$}: preferred phase parameter
+    <5->Can be written in a form that is linear in parameters
+{overprint}
+    \onslide<5>
+    \[y = \beta_o + A cos(\varphi_o) cos(\varphi) +  A sin(\varphi_o) sin(\varphi)\]
+    \onslide<6>
+    \[y = \beta_o + \beta_1 cos(\varphi) + \beta_2 sin(\varphi)\]
+
+#@Generalized linear model: nonlinearity on the response variable
+\[F(y) = XB\]
+
+#############################################################################
+$GLM point process for spike trains
+$$ 
+@Point process model:
+    Truccolo et al. 2005:
+        <1->``neural spike trains form a sequence of discrete events or point process time series''
+        <2->``standard linear or nonlinear regression methods are designed for analysis of continuous-valued data and not point process observations''
+    <3->Smoothing or binning can alter the structure
+    <4->GLM Point-process models directly model spike trains without these drawbacks
+
+@GLM point process models
+    <1->Consider a homogeneous Poisson process with rate $\lambda$. 
+        expected \# observations in time window $\Delta$ is $\lambda\Delta$
+    <2->For inhomogeneous Poisson process rate varies time $\lambda(t)$
+        \# observations from $t$ to $t+\Delta$ is $\int_t^{t+\Delta} \lambda(t) dt$
+    <3->$\lambda(t)$ is called the "intensity function"
+    <4->In a point process model we predict \emph{conditional intensity} based on measured covariates $\lambda(t|X(t))$
+    <5->The Poisson GLM point process framework models conditional intensity functions of the form
+{overprint}
+    \onslide<5>
+    \[\lambda(t|X(t)) = \exp \left\{ \mu + X B \right\}\]
+
+#############################################################################
+
+@Fitting GLM point-process models   
+    <1->In practice spiking time series are discretized at some resolution $\Delta$
+        <2->Predict sequence of spike counts $y_t=(y_1,y_2,...)$
+        <3->With a discrete approximation of the conditional intensity $\lambda_t=(\lambda_1,\lambda_2,...)$
+        <4->Based on discretely sampled covariates $X_t=(x_1,x_2,...)$
+    <5->Typically $\Delta$ chosen such that $y_t\in\{0,1\}$, (larger bins can be used, making it a count process)
+    <6->Model estimated by finding parameters $B$ that maximize the likelihood of the observed spikes $y$ and covariates $X$
+        <7->Can be fit with iteratively reweighted least squares 
+        <8->MATLAB glmfit \\ \href{http://www.mathworks.com/help/stats/glmfit.html}{\beamergotobutton{mathworks.com/help/stats/glmfit.htmlt}}
+        <9->Python scikits.statsmodels.GLM \href{http://statsmodels.sourceforge.net/stable/glm.html}{\beamergotobutton{statsmodels.sourceforge.net/stable/glm.html}} 
+        <10->I typically use gradient descent
+
+@GLM point process model for single unit spiking with ensemble history
+{overprint}
+    \onslide<1>
+    \[\begin{aligned}\log[\lambda(t|X(t))\Delta] &= \mu \\
+    &\phantom{{}+ \text{\emph{intrinsic history}}} \\
+    &\phantom{{}+ \text{\emph{ensemble history}}}\\
+    &\phantom{{}+ \text{\emph{extrinsic covariates}}}\end{aligned}\]
+    \onslide<2>
+    \[\begin{aligned}\log[\lambda(t|X(t))\Delta] &= \mu \\
+    &{}+ \text{\emph{intrinsic history}} \\
+    &\phantom{{}+ \text{\emph{ensemble history}}}\\
+    &\phantom{{}+ \text{\emph{extrinsic covariates}}}\end{aligned}\]
+    \onslide<3>
+    \[\begin{aligned}\log[\lambda(t|X(t))\Delta] &= \mu \\
+    &{}+ \text{\emph{intrinsic history}} \\
+    &{}+ \text{\emph{ensemble history}}\\
+    &\phantom{{}+ \text{\emph{extrinsic covariates}}}\end{aligned}\]
+    \onslide<4>
+    \[\begin{aligned}\log[\lambda(t|X(t))\Delta] &= \mu \\
+    &{}+ \text{\emph{intrinsic history}} \\
+    &{}+ \text{\emph{ensemble history}}\\
+    &{}+ \text{\emph{extrinsic covariates}}\end{aligned}\]
+
+@Intrinsic history filter
+    <1->Theoretically, model the whole history \[\lambda_t(t|\theta,y_{t-1},y_{t-2},...,y_1) \propto \exp\left\{ \sum_{\tau=1}^t \gamma_\tau y_{t-\tau} \right\}\]
+    <2->In practice: use finite history duration with \emph{basis functions} (a form of regularization: enforce smoothness and reduce parameters) \[\lambda_t(t|\theta,y_{t-\tau:t-1}) \propto \exp\left\{ B \cdot y_{t-\tau:t-1} \right\}\]
+{overprint}
+    \onslide<2>
+    [intrinsic_basis,0.3]
+
+@Ensemble history filter
+    <1->Ensemble history filters are treated similarly to intrinsic history
+    <2->Typically use fewer basis functions than for the intrinsic history, otherwise the number of parameters becomes prohibitive
+    <3->If using regularization, typically each neuron's parameters are penalized as a group (sparse connectivity prior)
+    <4->More on intrinsic history and network connectivity next week
+
+@Extrinsic covariates: kinematics
+    <1->Truccolo et al. 2005 explore a 2D velocity tuning model based on the $x$ and $y$ components of hand velocity. 
+    <2->Hatsopoulos et al. 2007 use normalized, extended velocity trajectories "pathlets"
+#    <3->Rule et al. 2015 found Hatsopoulos normalized "pathlets" and position trajectories to perform equivalently
+
+
+#############################################################################
+
+#############################################################################
+
+@Maximum likelihood approach to model fitting
+    <1->Let $y_t$ be an inhomogeneous Poisson with time varying rate $\lambda_t$
+    <2->The probability of observing $k$ spikes in a time interval $\Delta$ is Poisson distributed\[\Pr(y_t=k) \approx (\Delta \lambda_t)^{y_t} \frac{ e^{-\Delta \lambda_t}}{y_t!}\]
+    <3->Assuming conditional independence, the probability of observing an entire sequence $y_t$ is \[\Pr(y|\lambda) = \prod_{t=1}^T (\Delta\lambda_t)^{y_t} e^{-\Delta\lambda_t} / {y_t}! \]
+    
+@Minimize the negative log-likelihood
+    <1->Fit the model by finding the parameters $\mu$, $B$ that \emph{maximize the likelihood} $\mathcal{L}(\mu,B|y) = \Pr(y|\mu,B)$ of the observations\footnote{Note: writing $\lambda_t$ here instead of $\Delta\lambda_t$, i.e. let $\Delta=1$. In this case, parameters $\mu$ and $B$ will take units of $\Delta$} \[\Pr(y|\mu,B) = \prod_{t=1}^T \lambda_t^{y_t} e^{-\lambda_t} / {y_t}! \]\[\lambda_t=\exp(\mu + X_t B)\]
+    <2->In practice, \emph{minimize the negative log-likelihood}, which, if $\Delta$ is small $s.t.$ $y_t$ is always 0 or 1 \[ -\ln\mathcal{L}(\mu,B|y) =  \sum_{t=1}^T[ \lambda_t - y_t \ln(\lambda_t) ]\]
+    
+@Gradient of the negative log-likelihood
+    <1->Let $f(\mu,B)$ be the negative log likelihood \[f(\mu,B) = -\ln\mathcal{L}(\mu,B|y) =  \sum_{t=1}^T[ \lambda_t - y_t \ln(\lambda_t) ]\]
+    <2->Substitute our model $\lambda_t=e^{\mu + X_t B}$ \[f(\mu,B) =  \sum_{t=1}^T[ e^{\mu + X_t B} - y_t (\mu + X_t B) ]\]
+    <3->The partial derivatives, w.r.t $\mu$ and $(\beta_1,\beta_2,...)=B$ are:\[\begin{aligned}\frac{\partial f}{\partial    \mu}=&\sum_{t=1}^T[e^{\mu+X_t B}-y_t]\\\frac{\partial f}{\partial\beta_i}=&\sum_{t=1}^T[X_{t,i} e^{\mu+X_t B}-y_t X_{t,i}]\end{aligned}\]
+
+#############################################################################
+$$Regularization
+
+@Regularized GLM 
+    <1->Cross-validation is necessary to assess over-fitting: 
+        data should be separated into training and testing sets
+    <2->For larger number of parameters, the model \emph{will} overfit:
+        regularization is necessary. 
+    <3->Regularization can be incorporated by adding a penalty term to the negative log-likelihood function \[\argmin_{\mu,B}\left\{ \textrm{\emph{Penalty}}(B) - \ln\mathcal{L}(\mu,B|y) \right\}\]
+    <4->Conjugate gradient solvers are useful here
+
+@Regularized GLM: L1 and L2
+    <1->L2 penalty: Parameters penalized by their squared magnitudes\[  \alpha \sum_{i=1}^N \beta_i^2 \]
+        <2->Equivalent to a Gaussian prior on parameters
+        <3->Can be solved with gradient descent
+    <4->L1 penalty: Parameters penalized by their absolute magnitude\[ \alpha \sum_{i=1}^N |\beta_i| \]
+        <5->Promotes $\beta_i=0$, useful for finding sparse solutions
+        <6->Discontinuous gradient at $\beta_i=0$ percludes gradient descent. 
+        <7->Can use coordinate descent (although we ran into convergence issues?)
+
+@Regularized GLM: L1 approximation and L0
+    <1->~$\sqrt{x^2+\epsilon}:$ Smooth approximation of L1 penalty that is suitable for gradient descent\footnote{Called "Charbonnier penalty" in the computer vision literature (Charbonnier et al. 1994)}\[ \alpha \sum_{i=1}^N \sqrt{\beta_i^2+\varepsilon} \]
+        <2->$\epsilon$ is chosen to be small, but strictly positive
+    <3->L0 penalty: Constant penalty if a parameter is nonzero\[ \alpha \sum_{i=1}^N \delta(\beta_i\ne 0) \]
+        <4->Computationally infeasible
+        <5->Greedy algorithms are a good (the best polynomial time?) approximation
+
+@Regularized GLM: Group lasso
+    <1->Concept: penalize \emph{groups} of parameters with the L1 norm\[ \alpha \sum_{i=1}^N \sqrt{ \sum_{j=1}^K \beta_{i,j}^2 } \]
+        <2->Useful for penalizing ensemble filters as a group for each neuron
+        <3->Derivative is undefined at $\sqrt{ \sum_{j=1}^K \beta_{i,j}^2 }=0$
+        <4->Roth \& Fischer 2008\footnote{Roth, Volker, and Bernd Fischer. "The group-lasso for generalized linear models: uniqueness of solutions and efficient algorithms." Proceedings of the 25th international conference on Machine learning. ACM, 2008.} discuss an efficient fitting procedure
+
+#@Regularized GLM: Elastic net
+    <1->Concept: dynamic trade-off between L1 and L2
+        <2-> Code crashed pretty hard. 
+
+#############################################################################
+
+@Two-layer crossvalidation
+    <1->The strength of regularization $\alpha$ is another free parameter
+        Can be fixed in advance or...
+        <2->Two-level crossvalidation can be used to estimate $\alpha$ from the data
+    <3->K-fold two-layer crossvalidation results in K${}^2$ parameter fitting steps
+        This can get slow on large datasets
+        
+        
+#############################################################################
+
+@Regularization paths
+    Regularization paths:
+        When evaluating a range of regularization parameters e.g. $\alpha=(0,0.1,1,20)$,
+        Carry over the model weights $\mu$ and $\beta$. 
+        That is, for example, start the parameter tuning for $\alpha=1$ with the $\mu,B$ returned from $\alpha=0.1$
+
+@Initialization with closed form solution
+    <1->Fitting many models using a large amount of data can take a very long time
+    <2->Using an approximation to estimate a good starting location can give some speedup
+    <2->Ramirez, A. D., \& Paninski, L. (2014). Fast inference in generalized linear models via expected log-likelihoods. Journal of computational neuroscience, 36(2), 215-234.
+
+
+
+
+#Fs = 1000.0
+#N  = 1000 * Fs
+#for b in linspace(0,10,3):
+#    for r in linspace(5,150,3):
+#        print N,b,r
+#        x = randn(N)
+#        l = exp(b*x)/Fs
+#        y = rand(N)<l
+#        k = mean(y)*Fs
+#        correction = log(r/k)
+#        print '\t','correction=',correction
+#        l = exp(b*x+correction)/Fs
+#        y = rand(N)<l
+#        print '\t',mean(y)*Fs,sum(y)
+#        print '\t',mean(x[y])
+
+@
+{center}
+    Truccolo et al. 2005 
+
+$Truccolo et al. 2005 figures and equations
+$$ Eqn
+@
+[truccolo2005eq1,None]
+@
+[truccolo2005eq2,None]
+@
+[truccolo2005eq3,None]
+@
+[truccolo2005eq4,None]
+@
+[truccolo2005eq5,None]
+@
+[truccolo2005eq6,None]
+@
+[truccolo2005eq7,None]
+@
+[truccolo2005eq8,None]
+@
+
+[truccolo2005eq9,None]
+@
+[truccolo2005eq10,None]
+@
+[truccolo2005eq11,None]
+@
+[truccolo2005eq12,None]
+@
+[truccolo2005eq13,None]
+@
+[truccolo2005eq14,None]
+@
+[truccolo2005eq15,None]
+@
+[truccolo2005eq16,None]
+@
+[truccolo2005eq17,None]
+@
+[truccolo2005eq18,None]
+@
+[truccolo2005eq19,None]
+@
+[truccolo2005eq20,None]
+@
+[truccolo2005eq21,None]
+@
+[truccolo2005eq22,None]
+
+$$ FIG
+@
+[truccolo2005f1]
+@
+[truccolo2005f2]
+@
+[truccolo2005f3]
+@
+[truccolo2005f4]
+@
+[truccolo2005f5]
+@
+[truccolo2005f6]
+@
+[truccolo2005f7]
+@
+[truccolo2005f8]
+@
+[truccolo2005f9]
+@
+[truccolo2005f10]
+
+$$ APPENDIX
+@
+[truccolo2005eqA1,None]
+@
+[truccolo2005eqA2,None]
+@
+[truccolo2005eqA3,None]
+@
+[truccolo2005eqA4,None]
+@
+[truccolo2005eqA5,None]
+@
+[truccolo2005eqA6,None]
+@
+[truccolo2005eqA7,None]
+@
+[truccolo2005eqA8,None]
+@
+[truccolo2005eqA9,None]
+@
+[truccolo2005eqA10,None]
+
+
+
+
+
+
+
+
+
+
+@
+END
