@@ -33,9 +33,32 @@ done
 
 echo -e $output | column -t -s ', '
 
+
+# Clean up editor and temp files from the local directory (even if not 
+# tracked by git)
+echo "Deleting editor temporary files"
+find . -name "*.pyc" -exec rm -rf {} \; 2>/dev/null
+find . -name "*~" -exec rm -rf {} \;  2>/dev/null
+
+# Add any new files, add all updates to all files
+
+echo "Adding all changes"
+git add --all . 
+git add -u :/
+
+# Commit using the message specified as first argument to this script
+
+echo "Git commit"
+git commit -m "git broke"
+
 git filter-branch -f --index-filter "git rm -rf --cached --ignore-unmatch 20170418_Rule_ANC_Edinburgh_talk.pdf" HEAD
 git filter-branch -f --index-filter "git rm -rf --cached --ignore-unmatch RuleEtAl_SfN2015_11.pdf" HEAD
 git filter-branch -f --index-filter "git rm -rf --cached --ignore-unmatch out0.gif" HEAD
 git filter-branch -f --index-filter "git rm -rf --cached --ignore-unmatch 3.gif" HEAD
 git filter-branch -f --index-filter "git rm -rf --cached --ignore-unmatch __get_url_as_soup_cache.zip" HEAD
+
+rm -rf .git/refs/original/
+git reflog expire --expire=now --all
+git gc --prune=now
+git gc --aggressive --prune=now
 
