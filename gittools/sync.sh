@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-./maketree.py
+cd ../
+
+./gittools/maketree.py
 
 # Clean up editor and temp files from the local directory (even if not 
 # tracked by git)
@@ -25,3 +27,5 @@ git pull
 
 echo "git push"
 git push origin master
+
+cd ./gittools
