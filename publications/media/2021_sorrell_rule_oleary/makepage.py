@@ -18,5 +18,5 @@ for u in use:
 
 html += "\n</body></html>"
 
-with open("index.html", "w") as text_file:
+with open("sorrell_rule_2021_thumbnails.html", "w") as text_file:
     text_file.write(html)
