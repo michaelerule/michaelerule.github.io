@@ -6,6 +6,8 @@ import sys,os
 
 html = '''
 <html><head></head><body>
+(thumbnails; click to download .svg or high resolution version)
+<br/>
 '''
 
 use = [f for f in os.listdir('.') if '.svg' in f or '.png' in f]
